@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Setup Offline POS
+Comment=One-click setup for Offline POS Docker stack
+Terminal=true
+Exec=bash -lc 'SCRIPT_DIR="$(dirname "%k")"; "$SCRIPT_DIR/Setup_Offline_POS_Ubuntu.sh"'
+Icon=utilities-terminal
+Categories=Development;

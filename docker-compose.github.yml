@@ -1,0 +1,135 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/offline/apache/Dockerfile
+    depends_on:
+      app:
+        condition: service_started
+    ports:
+      - "8080:80"
+    volumes:
+      - app_code:/var/www/html:ro
+      - app_storage:/var/www/html/storage
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/offline/php/Dockerfile.runtime
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      APP_ZIP_URL: ${APP_ZIP_URL:-http://taxnomist.busywizzy.com/pos_1.0.zip}
+      APP_SYNC_ZIP_ON_START: ${APP_SYNC_ZIP_ON_START:-1}
+      APP_VERSION_URL: ${APP_VERSION_URL:-}
+      APP_TARGET_VERSION: ${APP_TARGET_VERSION:-}
+      APP_ENABLE_VERSION_SYNC_ON_START: ${APP_ENABLE_VERSION_SYNC_ON_START:-0}
+      DB_SETUP_MODE: ${DB_SETUP_MODE:-sql}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      DB_USERNAME: ${DB_APP_USER:-app}
+      DB_PASSWORD: ${DB_APP_PASSWORD:-app123}
+      DB_READ_HOST: db
+      DB_READ_PORT: 3306
+      DB_READ_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      DB_READ_USERNAME: ${DB_APP_USER:-app}
+      DB_READ_PASSWORD: ${DB_APP_PASSWORD:-app123}
+    command:
+      - sh
+      - /usr/local/bin/start-app.sh
+    volumes:
+      - app_code:/var/www/html
+      - app_storage:/var/www/html/storage
+    extra_hosts:
+      - "agretail.ddev.site:host-gateway"
+    restart: unless-stopped
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/offline/php/Dockerfile.runtime
+    depends_on:
+      app:
+        condition: service_started
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      DB_USERNAME: ${DB_APP_USER:-app}
+      DB_PASSWORD: ${DB_APP_PASSWORD:-app123}
+      DB_READ_HOST: db
+      DB_READ_PORT: 3306
+      DB_READ_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      DB_READ_USERNAME: ${DB_APP_USER:-app}
+      DB_READ_PASSWORD: ${DB_APP_PASSWORD:-app123}
+    command:
+      - sh
+      - -lc
+      - |
+        set -e
+        until [ -f /var/www/html/vendor/autoload.php ]; do echo "Waiting for dependencies..."; sleep 2; done
+        cd /var/www/html
+        php artisan queue:work --tries=3 --timeout=120 --sleep=2
+    volumes:
+      - app_code:/var/www/html
+      - app_storage:/var/www/html/storage
+    restart: unless-stopped
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/offline/php/Dockerfile.runtime
+    depends_on:
+      app:
+        condition: service_started
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      DB_USERNAME: ${DB_APP_USER:-app}
+      DB_PASSWORD: ${DB_APP_PASSWORD:-app123}
+      DB_READ_HOST: db
+      DB_READ_PORT: 3306
+      DB_READ_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      DB_READ_USERNAME: ${DB_APP_USER:-app}
+      DB_READ_PASSWORD: ${DB_APP_PASSWORD:-app123}
+    command:
+      - sh
+      - -lc
+      - |
+        set -e
+        until [ -f /var/www/html/vendor/autoload.php ]; do echo "Waiting for dependencies..."; sleep 2; done
+        cd /var/www/html
+        while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done
+    volumes:
+      - app_code:/var/www/html
+      - app_storage:/var/www/html/storage
+    restart: unless-stopped
+
+  db:
+    image: mysql:5.7.44
+    platform: linux/amd64
+    command:
+      - --sql-mode=
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-agrtl_offline}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root123}
+      MYSQL_USER: ${DB_APP_USER:-app}
+      MYSQL_PASSWORD: ${DB_APP_PASSWORD:-app123}
+    ports:
+      - "${DB_PORT_HOST:-3308}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  app_storage:
+  app_code:

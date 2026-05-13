@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Full setup in one command for ZIP-based Laravel source.
+# Usage:
+#   ./scripts/offline/setup-full-offline.sh [laravel_zip_url]
+# Example:
+#   ./scripts/offline/setup-full-offline.sh http://taxnomist.busywizzy.com/pos_1.0.zip
+# If URL is not passed, script resolves version via API and builds ZIP URL from .env.offline.
+
+APP_ZIP_URL_INPUT="${1:-}"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+OFFLINE_ENV_FILE="${OFFLINE_ENV_FILE:-$PROJECT_ROOT/.env.offline}"
+if [[ -f "$OFFLINE_ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$OFFLINE_ENV_FILE"
+  set +a
+fi
+
+APP_ZIP_URL="${APP_ZIP_URL_INPUT:-${APP_ZIP_URL:-}}"
+APP_VERSION_URL="${APP_VERSION_URL:-https://agretail.ddev.site/api/offline/version}"
+OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
+OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
+
+fetch_target_version() {
+  if [[ -z "$OFFLINE_STORE_ID" || -z "$OFFLINE_TOKEN" ]]; then
+    return 1
+  fi
+
+  payload="$(printf '{"store_id": %s, "offline_token":"%s"}' "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN")"
+  response="$(curl -fsSL --request GET "$APP_VERSION_URL" --header 'Content-Type: application/json' --data "$payload" || true)"
+  if [[ -z "$response" ]]; then
+    return 1
+  fi
+
+  compact="$(printf "%s" "$response" | tr -d '\r\n')"
+  parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+
+  if [[ -z "$parsed" ]]; then
+    parsed="$(printf "%s" "$compact" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  fi
+
+  if [[ -n "$parsed" ]]; then
+    printf "%s" "$parsed"
+  else
+    printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  fi
+}
+
+if [[ -z "$APP_ZIP_URL" ]]; then
+  echo "Error: APP_ZIP_URL is not set. Pass URL argument or define APP_ZIP_URL in .env.offline."
+  exit 1
+fi
+
+if [[ "$APP_ZIP_URL" == *APP_VERSION* ]]; then
+  resolved_version="$(fetch_target_version || true)"
+  if [[ -z "$resolved_version" ]]; then
+    echo "Error: could not resolve app version from API. Check OFFLINE_STORE_ID/OFFLINE_TOKEN/APP_VERSION_URL."
+    exit 1
+  fi
+  APP_ZIP_URL="${APP_ZIP_URL//APP_VERSION/$resolved_version}"
+  echo "Resolved version from API: $resolved_version"
+fi
+
+COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT/docker-compose.github.yml}"
+APP_SYNC_ZIP_ON_START="${APP_SYNC_ZIP_ON_START:-1}"
+DB_SETUP_MODE="${DB_SETUP_MODE:-structure}"
+
+if [[ "$DB_SETUP_MODE" == "structure" ]] && compgen -G "$PROJECT_ROOT/docker/mysql/*.sql" >/dev/null; then
+  DB_SETUP_MODE="sql"
+fi
+
+# Defaults can be overridden via env vars while running this script.
+DB_DATABASE="${DB_DATABASE:-agrtl_offline}"
+DB_PASSWORD="${DB_PASSWORD:-root123}"
+DB_APP_USER="${DB_APP_USER:-app}"
+DB_APP_PASSWORD="${DB_APP_PASSWORD:-app123}"
+DB_PORT_HOST="${DB_PORT_HOST:-3308}"
+READY_CHECK_ATTEMPTS="${READY_CHECK_ATTEMPTS:-300}"
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Error: docker is not installed or not in PATH."
+  exit 1
+fi
+
+echo "Starting full offline setup..."
+echo "Project root: $PROJECT_ROOT"
+echo "Compose file: $COMPOSE_FILE"
+echo "DB setup mode: $DB_SETUP_MODE"
+
+cd "$PROJECT_ROOT"
+
+APP_ZIP_URL="$APP_ZIP_URL" \
+APP_SYNC_ZIP_ON_START="$APP_SYNC_ZIP_ON_START" \
+DB_SETUP_MODE="$DB_SETUP_MODE" \
+DB_DATABASE="$DB_DATABASE" \
+DB_PASSWORD="$DB_PASSWORD" \
+DB_APP_USER="$DB_APP_USER" \
+DB_APP_PASSWORD="$DB_APP_PASSWORD" \
+DB_PORT_HOST="$DB_PORT_HOST" \
+docker compose -f "$COMPOSE_FILE" up -d --build
+
+echo "Applying post-setup Laravel maintenance..."
+maintenance_ok=0
+for i in {1..180}; do
+  if docker compose -f "$COMPOSE_FILE" exec -T app sh -lc '
+cd /var/www/html
+
+if [ ! -f artisan ]; then
+  echo "artisan not found yet; waiting for app bootstrap..."
+  exit 1
+fi
+
+if [ -f .env ]; then
+    if grep -q "^POS_OFFLINE_MODE=" .env; then
+      sed -i "s|^POS_OFFLINE_MODE=.*|POS_OFFLINE_MODE=true|" .env
+  else
+      echo "POS_OFFLINE_MODE=true" >> .env
+  fi
+fi
+
+mkdir -p storage/framework/sessions \
+         storage/framework/views \
+         storage/framework/cache/data \
+         storage/logs \
+         bootstrap/cache
+
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R ug+rwX storage bootstrap/cache
+
+php artisan optimize:clear
+'; then
+    maintenance_ok=1
+    echo "Post-setup Laravel maintenance completed."
+    break
+  fi
+  sleep 2
+done
+
+if [[ "$maintenance_ok" -ne 1 ]]; then
+  echo "Warning: post-setup Laravel maintenance could not be completed yet."
+fi
+
+echo "Waiting for app endpoint to become ready..."
+for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
+  status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
+  if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
+    echo "Setup complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
+    echo "Tip: code sync runs once on first startup and skips on container restarts by default."
+    echo "To force sync every start, run with APP_SYNC_ZIP_ON_START=always."
+    exit 0
+  fi
+  sleep 2
+done
+
+echo "Setup finished, but app is not ready yet."
+echo "Run: docker compose -f $COMPOSE_FILE logs --tail=200 app web"
+exit 1
