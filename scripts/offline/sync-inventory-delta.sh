@@ -29,6 +29,11 @@ OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-}"
 APP_VERSION_URL="${APP_VERSION_URL:-}"
 OFFLINE_INVENTORY_SINCE="${SINCE_INPUT:-${OFFLINE_INVENTORY_SINCE:-}}"
 
+if [[ -z "$OFFLINE_INVENTORY_SINCE" ]]; then
+  # Default to one hour back; support both BSD date (macOS) and GNU date.
+  OFFLINE_INVENTORY_SINCE="$(date -u -v-1H '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -u -d '1 hour ago' '+%Y-%m-%d %H:%M:%S')"
+fi
+
 if [[ -z "$OFFLINE_API_BASE_URL" ]]; then
   OFFLINE_API_BASE_URL="${POS_OFFLINE_SYNC_SOURCE_URL:-}"
 fi
@@ -54,12 +59,6 @@ if [[ -z "$OFFLINE_API_BASE_URL" ]]; then
   exit 1
 fi
 
-if [[ -z "$OFFLINE_INVENTORY_SINCE" ]]; then
-  echo "Error: since timestamp is required for delta sync."
-  echo "Pass it as second argument or set OFFLINE_INVENTORY_SINCE in $OFFLINE_ENV_FILE."
-  exit 1
-fi
-
 cd "$PROJECT_ROOT"
 
 echo "Running offline:sync-inventory delta for store_id=$OFFLINE_STORE_ID since=$OFFLINE_INVENTORY_SINCE"
@@ -69,22 +68,37 @@ docker compose -f "$COMPOSE_FILE" exec -T \
   -e OFFLINE_API_BASE_URL="$OFFLINE_API_BASE_URL" \
   -e OFFLINE_INVENTORY_SINCE="$OFFLINE_INVENTORY_SINCE" \
   app sh -lc '
-cd /var/www/html
+APP_ROOT="/var/www/html"
+if [ -f /var/www/html/pos/artisan ]; then
+  APP_ROOT="/var/www/html/pos"
+fi
+
+cd "$APP_ROOT"
 if [ ! -f artisan ]; then
-  echo "Error: artisan not found in /var/www/html"
+  echo "Error: artisan not found in $APP_ROOT"
   exit 1
 fi
 
-mkdir -p storage/framework/sessions \
-         storage/framework/views \
-         storage/framework/cache/data \
-         storage/logs \
-         bootstrap/cache
+set_kv() {
+  key="$1"; val="$2"
+  [ -z "$val" ] && return 0
+  case "$key" in OFFLINE_API_BASE_URL|POS_OFFLINE_SYNC_SOURCE_URL)
+    val="${val%/}/" ;;
+  esac
+  grep -v "^${key}=" .env > /tmp/.env_kv_tmp 2>/dev/null || true
+  echo "${key}=${val}" >> /tmp/.env_kv_tmp
+  cp /tmp/.env_kv_tmp .env
+}
+set_kv OFFLINE_API_BASE_URL "$OFFLINE_API_BASE_URL"
+set_kv OFFLINE_TOKEN "$OFFLINE_TOKEN"
+set_kv OFFLINE_STORE_ID "$OFFLINE_STORE_ID"
+set_kv POS_OFFLINE_SYNC_SOURCE_URL "$OFFLINE_API_BASE_URL"
+set_kv POS_OFFLINE_SYNC_TOKEN "$OFFLINE_TOKEN"
+set_kv POS_OFFLINE_SYNC_STORE_ID "$OFFLINE_STORE_ID"
 
-chown -R www-data:www-data storage bootstrap/cache || true
-chmod -R ug+rwX storage bootstrap/cache
+php artisan config:clear 2>/dev/null || true
 
-php artisan offline:sync-inventory "$OFFLINE_STORE_ID" --delta=1 --since="$OFFLINE_INVENTORY_SINCE" --base-url="$OFFLINE_API_BASE_URL" --token="$OFFLINE_TOKEN"
+php artisan offline:sync-inventory "$OFFLINE_STORE_ID" --delta=1 --since="$OFFLINE_INVENTORY_SINCE" 
 '
 
 echo "offline:sync-inventory (delta) completed."

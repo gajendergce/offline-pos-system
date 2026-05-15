@@ -186,8 +186,16 @@ mkdir -p storage/framework/sessions \
          storage/logs \
          bootstrap/cache
 
-chown -R www-data:www-data storage bootstrap/cache
-chmod -R ug+rwX storage bootstrap/cache
+# Laravel app references /var/www/html/pos/storage internally; keep dirs in sync.
+mkdir -p /var/www/html/pos/storage/framework/sessions \
+         /var/www/html/pos/storage/framework/views \
+         /var/www/html/pos/storage/framework/cache/data \
+         /var/www/html/pos/storage/logs \
+         /var/www/html/pos/bootstrap/cache
+
+chown -R www-data:www-data storage bootstrap/cache \
+                            /var/www/html/pos/storage /var/www/html/pos/bootstrap/cache
+chmod -R 777 storage /var/www/html/pos/storage
 
 composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -218,5 +226,10 @@ case "$DB_SETUP_MODE" in
 esac
 
 php artisan key:generate --force || true
+
+php artisan config:clear || true
+php artisan view:clear || true
+php artisan cache:clear || true
+php artisan optimize:clear || true
 
 exec php-fpm

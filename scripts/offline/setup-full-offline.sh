@@ -25,6 +25,51 @@ APP_ZIP_URL="${APP_ZIP_URL_INPUT:-${APP_ZIP_URL:-}}"
 APP_VERSION_URL="${APP_VERSION_URL:-https://agretail.ddev.site/api/offline/version}"
 OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
 OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
+OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-${POS_OFFLINE_SYNC_SOURCE_URL:-}}"
+
+if [[ -z "$OFFLINE_API_BASE_URL" && -n "$APP_VERSION_URL" ]]; then
+  OFFLINE_API_BASE_URL="$(printf '%s' "$APP_VERSION_URL" | sed 's#/api/offline/version/?$##')"
+fi
+
+sync_offline_env_into_app_env() {
+  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc '
+cd /var/www/html
+
+store_id="$1"
+token="$2"
+base_url="$3"
+version_url="$4"
+zip_url="$5"
+
+if [ ! -f .env ]; then
+  exit 0
+fi
+
+set_kv() {
+  key="$1"
+  val="$2"
+  if [ -z "$val" ]; then
+    return 0
+  fi
+
+  if grep -q "^${key}=" .env; then
+    sed -i "s|^${key}=.*|${key}=${val}|" .env
+  else
+    echo "${key}=${val}" >> .env
+  fi
+}
+
+set_kv POS_OFFLINE_MODE true
+set_kv OFFLINE_STORE_ID "$store_id"
+set_kv OFFLINE_TOKEN "$token"
+set_kv OFFLINE_API_BASE_URL "$base_url"
+set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
+set_kv POS_OFFLINE_SYNC_TOKEN "$token"
+set_kv POS_OFFLINE_SYNC_SOURCE_URL "$base_url"
+set_kv APP_VERSION_URL "$version_url"
+set_kv APP_ZIP_URL "$zip_url"
+' sh "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN" "$OFFLINE_API_BASE_URL" "$APP_VERSION_URL" "$APP_ZIP_URL"
+}
 
 fetch_target_version() {
   if [[ -z "$OFFLINE_STORE_ID" || -z "$OFFLINE_TOKEN" ]]; then
@@ -107,7 +152,7 @@ docker compose -f "$COMPOSE_FILE" up -d --build
 echo "Applying post-setup Laravel maintenance..."
 maintenance_ok=0
 for i in {1..180}; do
-  if docker compose -f "$COMPOSE_FILE" exec -T app sh -lc '
+  if docker compose -f "$COMPOSE_FILE" exec -T -u root app sh -lc '
 cd /var/www/html
 
 if [ ! -f artisan ]; then
@@ -131,6 +176,7 @@ mkdir -p storage/framework/sessions \
 
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
+chmod -R 777 storage
 
 php artisan optimize:clear
 '; then
@@ -144,6 +190,9 @@ done
 if [[ "$maintenance_ok" -ne 1 ]]; then
   echo "Warning: post-setup Laravel maintenance could not be completed yet."
 fi
+
+echo "Syncing .env.offline values into app .env..."
+sync_offline_env_into_app_env
 
 echo "Waiting for app endpoint to become ready..."
 for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do

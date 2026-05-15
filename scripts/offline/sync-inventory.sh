@@ -58,22 +58,49 @@ docker compose -f "$COMPOSE_FILE" exec -T \
   -e OFFLINE_TOKEN="$OFFLINE_TOKEN" \
   -e OFFLINE_API_BASE_URL="$OFFLINE_API_BASE_URL" \
   app sh -lc '
-cd /var/www/html
+APP_ROOT="/var/www/html"
+if [ -f /var/www/html/pos/artisan ]; then
+  APP_ROOT="/var/www/html/pos"
+fi
+
+cd "$APP_ROOT"
 if [ ! -f artisan ]; then
-  echo "Error: artisan not found in /var/www/html"
+  echo "Error: artisan not found in $APP_ROOT"
   exit 1
 fi
 
-mkdir -p storage/framework/sessions \
-         storage/framework/views \
-         storage/framework/cache/data \
-         storage/logs \
-         bootstrap/cache
+set_kv() {
+  key="$1"; val="$2"
+  [ -z "$val" ] && return 0
+  case "$key" in OFFLINE_API_BASE_URL|POS_OFFLINE_SYNC_SOURCE_URL)
+    val="${val%/}/" ;;
+  esac
+  grep -v "^${key}=" .env > /tmp/.env_kv_tmp 2>/dev/null || true
+  echo "${key}=${val}" >> /tmp/.env_kv_tmp
+  cp /tmp/.env_kv_tmp .env
+}
+set_kv OFFLINE_API_BASE_URL "$OFFLINE_API_BASE_URL"
+set_kv OFFLINE_TOKEN "$OFFLINE_TOKEN"
+set_kv OFFLINE_STORE_ID "$OFFLINE_STORE_ID"
+set_kv POS_OFFLINE_SYNC_SOURCE_URL "$OFFLINE_API_BASE_URL"
+set_kv POS_OFFLINE_SYNC_TOKEN "$OFFLINE_TOKEN"
+set_kv POS_OFFLINE_SYNC_STORE_ID "$OFFLINE_STORE_ID"
 
-chown -R www-data:www-data storage bootstrap/cache || true
-chmod -R ug+rwX storage bootstrap/cache
+php artisan config:clear 2>/dev/null || true
 
-php artisan offline:sync-inventory "$OFFLINE_STORE_ID" --base-url="$OFFLINE_API_BASE_URL" --token="$OFFLINE_TOKEN"
+php artisan offline:sync-inventory "$OFFLINE_STORE_ID"
+'
+
+echo "Running agr:recreate-invenplu for store_id=$OFFLINE_STORE_ID"
+docker compose -f "$COMPOSE_FILE" exec -T \
+  -e OFFLINE_STORE_ID="$OFFLINE_STORE_ID" \
+  app sh -lc '
+APP_ROOT="/var/www/html"
+if [ -f /var/www/html/pos/artisan ]; then
+  APP_ROOT="/var/www/html/pos"
+fi
+
+cd "$APP_ROOT"
 php artisan agr:recreate-invenplu "$OFFLINE_STORE_ID"
 '
 

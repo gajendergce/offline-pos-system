@@ -54,9 +54,14 @@ docker compose -f "$COMPOSE_FILE" exec -T \
   -e OFFLINE_TOKEN="$OFFLINE_TOKEN" \
   -e OFFLINE_API_BASE_URL="$OFFLINE_API_BASE_URL" \
   app sh -lc '
-cd /var/www/html
+APP_ROOT="/var/www/html"
+if [ -f /var/www/html/pos/artisan ]; then
+  APP_ROOT="/var/www/html/pos"
+fi
+
+cd "$APP_ROOT"
 if [ ! -f artisan ]; then
-  echo "Error: artisan not found in /var/www/html"
+  echo "Error: artisan not found in $APP_ROOT"
   exit 1
 fi
 

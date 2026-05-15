@@ -22,8 +22,84 @@ APP_VERSION_URL="${APP_VERSION_URL:-https://agretail.ddev.site/api/offline/versi
 APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
 OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
+OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-${POS_OFFLINE_SYNC_SOURCE_URL:-}}"
 SYNC_SERVICES="${SYNC_SERVICES:-app queue scheduler}"
 READY_CHECK_ATTEMPTS="${READY_CHECK_ATTEMPTS:-300}"
+
+if [[ -z "$OFFLINE_API_BASE_URL" && -n "$APP_VERSION_URL" ]]; then
+  OFFLINE_API_BASE_URL="$(printf '%s' "$APP_VERSION_URL" | sed 's#/api/offline/version/?$##')"
+fi
+
+sync_offline_env_into_app_env() {
+  local zip_value="$1"
+
+  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc '
+cd /var/www/html
+
+store_id="$1"
+token="$2"
+base_url="$3"
+version_url="$4"
+zip_url="$5"
+
+if [ ! -f .env ]; then
+  exit 0
+fi
+
+set_kv() {
+  key="$1"
+  val="$2"
+  if [ -z "$val" ]; then
+    return 0
+  fi
+
+  if grep -q "^${key}=" .env; then
+    sed -i "s|^${key}=.*|${key}=${val}|" .env
+  else
+    echo "${key}=${val}" >> .env
+  fi
+}
+
+set_kv POS_OFFLINE_MODE true
+set_kv OFFLINE_STORE_ID "$store_id"
+set_kv OFFLINE_TOKEN "$token"
+set_kv OFFLINE_API_BASE_URL "$base_url"
+set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
+set_kv POS_OFFLINE_SYNC_TOKEN "$token"
+set_kv POS_OFFLINE_SYNC_SOURCE_URL "$base_url"
+set_kv APP_VERSION_URL "$version_url"
+set_kv APP_ZIP_URL "$zip_url"
+' sh "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN" "$OFFLINE_API_BASE_URL" "$APP_VERSION_URL" "$zip_value"
+}
+
+ensure_scheduler_sync_keys() {
+  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
+cd /var/www/html
+if [ ! -f .env ] && [ -f .env.example ]; then
+  cp .env.example .env
+fi
+
+if [ -f .env ]; then
+  if grep -q '^POS_OFFLINE_SYNC_STORE_ID=' .env; then
+    sed -i 's|^POS_OFFLINE_SYNC_STORE_ID=.*|POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}|' .env
+  else
+    echo 'POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}' >> .env
+  fi
+
+  if grep -q '^POS_OFFLINE_SYNC_SOURCE_URL=' .env; then
+    sed -i 's|^POS_OFFLINE_SYNC_SOURCE_URL=.*|POS_OFFLINE_SYNC_SOURCE_URL=${OFFLINE_API_BASE_URL}|' .env
+  else
+    echo 'POS_OFFLINE_SYNC_SOURCE_URL=${OFFLINE_API_BASE_URL}' >> .env
+  fi
+
+  if grep -q '^POS_OFFLINE_SYNC_TOKEN=' .env; then
+    sed -i 's|^POS_OFFLINE_SYNC_TOKEN=.*|POS_OFFLINE_SYNC_TOKEN=${OFFLINE_TOKEN}|' .env
+  else
+    echo 'POS_OFFLINE_SYNC_TOKEN=${OFFLINE_TOKEN}' >> .env
+  fi
+fi
+"
+}
 
 usage() {
   echo "Usage: APP_VERSION_URL=<url> [APP_ZIP_URL=<zip>] $0"
@@ -91,6 +167,10 @@ echo "Old version from local marker: ${old_version:-none}"
 
 if [[ -n "$old_version" && "$old_version" == "$new_version" ]]; then
   echo "Version matches. No code pull needed."
+  echo "Syncing .env.offline values into app .env..."
+  sync_offline_env_into_app_env "$APP_ZIP_URL"
+  ensure_scheduler_sync_keys
+  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "cd /var/www/html && grep -q '^POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}$' .env || echo 'POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}' >> .env"
   exit 0
 fi
 
@@ -112,7 +192,7 @@ docker compose -f "$COMPOSE_FILE" up -d --build --force-recreate $SYNC_SERVICES
 echo "Applying post-sync Laravel maintenance..."
 maintenance_ok=0
 for i in {1..180}; do
-  if docker compose -f "$COMPOSE_FILE" exec -T app sh <<'APP_MAINTENANCE'; then
+  if docker compose -f "$COMPOSE_FILE" exec -T -u root app sh <<'APP_MAINTENANCE'; then
 cd /var/www/html
 
 if [ ! -f artisan ]; then
@@ -141,6 +221,7 @@ mkdir -p storage/framework/sessions \
 
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
+chmod -R 777 storage
 
 php artisan optimize:clear
 APP_MAINTENANCE
@@ -154,6 +235,11 @@ done
 if [[ "${maintenance_ok:-0}" -ne 1 ]]; then
   echo "Warning: post-sync Laravel maintenance could not be completed yet."
 fi
+
+echo "Syncing .env.offline values into app .env..."
+sync_offline_env_into_app_env "$resolved_zip_url"
+ensure_scheduler_sync_keys
+docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "cd /var/www/html && grep -q '^POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}$' .env || echo 'POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}' >> .env"
 
 docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
 cd /var/www/html
@@ -172,6 +258,7 @@ echo "Waiting for app endpoint to become ready..."
 for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
   status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
   if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
+    ensure_scheduler_sync_keys
     echo "Daily sync complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
     exit 0
   fi
