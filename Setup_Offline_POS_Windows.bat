@@ -70,6 +70,28 @@ if errorlevel 1 (
   goto :end
 )
 
+REM Wait for MySQL to accept connections, then guarantee app-user host access.
+REM MySQL skips re-init when the data volume already exists, so MYSQL_USER env
+REM is ignored on subsequent runs -- an explicit GRANT is the reliable fix.
+echo Waiting for MySQL to be ready...
+set /a _MYSQL_TRIES=0
+:mysql_wait
+docker compose -f "%COMPOSE_FILE%" exec -T db mysqladmin -uroot "-p%DB_PASSWORD%" ping --silent >nul 2>&1
+if not errorlevel 1 goto :mysql_ready
+set /a _MYSQL_TRIES+=1
+if %_MYSQL_TRIES% geq 30 (
+  echo MySQL did not become ready in time -- skipping privilege grant.
+  goto :after_grant
+)
+powershell -NoProfile -Command "Start-Sleep -Seconds 2" >nul
+goto :mysql_wait
+
+:mysql_ready
+set "PCT=%%"
+docker compose -f "%COMPOSE_FILE%" exec -T db mysql -uroot "-p%DB_PASSWORD%" -e "GRANT ALL PRIVILEGES ON %DB_DATABASE%.* TO '%DB_APP_USER%'@'%PCT%' IDENTIFIED BY '%DB_APP_PASSWORD%'; FLUSH PRIVILEGES;" >nul 2>&1
+echo MySQL privileges granted for %DB_APP_USER%@%PCT%.
+
+:after_grant
 echo Waiting for app endpoint to become ready...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$ok=$false; for($i=0;$i -lt 90;$i++){ try { $resp = Invoke-WebRequest -Uri 'http://localhost:8080/login' -MaximumRedirection 0 -ErrorAction Stop; if($resp.StatusCode -eq 200 -or $resp.StatusCode -eq 302){ $ok=$true; break } } catch { if($_.Exception.Response -and ($_.Exception.Response.StatusCode.Value__ -eq 302)){ $ok=$true; break } }; Start-Sleep -Seconds 2 }; if($ok){ exit 0 } else { exit 1 }"
 if errorlevel 1 (
