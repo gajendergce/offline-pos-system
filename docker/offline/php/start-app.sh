@@ -179,6 +179,10 @@ set_env_value "DB_READ_DATABASE" "${DB_READ_DATABASE:-${DB_DATABASE:-agrtl_offli
 set_env_value "DB_READ_USERNAME" "${DB_READ_USERNAME:-${DB_USERNAME:-app}}"
 set_env_value "DB_READ_PASSWORD" "${DB_READ_PASSWORD:-${DB_PASSWORD:-app123}}"
 set_env_value "POS_OFFLINE_MODE" "${POS_OFFLINE_MODE:-true}"
+[ -n "${OFFLINE_API_BASE_URL:-}" ]        && set_env_value "OFFLINE_API_BASE_URL"        "$OFFLINE_API_BASE_URL"
+[ -n "${POS_OFFLINE_SYNC_STORE_ID:-}" ]   && set_env_value "POS_OFFLINE_SYNC_STORE_ID"   "$POS_OFFLINE_SYNC_STORE_ID"
+[ -n "${POS_OFFLINE_SYNC_SOURCE_URL:-}" ] && set_env_value "POS_OFFLINE_SYNC_SOURCE_URL" "$POS_OFFLINE_SYNC_SOURCE_URL"
+[ -n "${POS_OFFLINE_SYNC_TOKEN:-}" ]      && set_env_value "POS_OFFLINE_SYNC_TOKEN"      "$POS_OFFLINE_SYNC_TOKEN"
 
 mkdir -p storage/framework/sessions \
          storage/framework/views \
