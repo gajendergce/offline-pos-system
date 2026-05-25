@@ -40,10 +40,13 @@ REM Resolve ZIP URL: replace APP_VERSION placeholder via API
 if not defined APP_ZIP_URL set "APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip"
 
 echo Fetching latest app version from API...
+set "_BODY_TMP=%TEMP%\pos_body_%RANDOM%.json"
 set "_VER_TMP=%TEMP%\pos_ver_%RANDOM%.json"
-curl.exe -s --location --request GET "%APP_VERSION_URL%" --header "Content-Type: application/json" --data "{\"store_id\":%OFFLINE_STORE_ID%,\"offline_token\":\"%OFFLINE_TOKEN%\"}" --output "%_VER_TMP%" 2>nul
+powershell -NoProfile -Command "$body = ConvertTo-Json @{store_id = %OFFLINE_STORE_ID%; offline_token = '%OFFLINE_TOKEN%'}; [IO.File]::WriteAllText('%_BODY_TMP%', $body)"
+curl.exe -s --ssl-no-revoke --location --request GET "%APP_VERSION_URL%" --header "Content-Type: application/json" --data @"%_BODY_TMP%" --output "%_VER_TMP%"
+del "%_BODY_TMP%" >nul 2>&1
 if not exist "%_VER_TMP%" (
-  echo Error: API request failed. Ensure curl.exe is available ^(Windows 10 1803+^) and network is reachable.
+  echo Error: API request failed. Check network connectivity and APP_VERSION_URL in .env.offline.
   goto :end
 )
 for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "(Get-Content -LiteralPath '%_VER_TMP%' -Raw | ConvertFrom-Json).POS_OFFLINE_BUNDLE_APP_VERSION"`) do set "RESOLVED_VERSION=%%V"
