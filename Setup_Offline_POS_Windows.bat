@@ -89,7 +89,16 @@ goto :mysql_wait
 :mysql_ready
 set "PCT=%%"
 docker compose -f "%COMPOSE_FILE%" exec -T db mysql -uroot "-p%DB_PASSWORD%" -e "GRANT ALL PRIVILEGES ON %DB_DATABASE%.* TO '%DB_APP_USER%'@'%PCT%' IDENTIFIED BY '%DB_APP_PASSWORD%'; FLUSH PRIVILEGES;" >nul 2>&1
-echo MySQL privileges granted for %DB_APP_USER%@%PCT%.
+if errorlevel 1 (
+  echo.
+  echo WARNING: Could not grant MySQL privileges -- root password mismatch.
+  echo The mysql_data volume likely has data from a previous run with a different password.
+  echo To fix, stop everything and wipe volumes, then re-run this script:
+  echo   docker compose -f "%COMPOSE_FILE%" down -v
+  echo.
+) else (
+  echo MySQL privileges granted for %DB_APP_USER%@%PCT%.
+)
 
 :after_grant
 echo Waiting for app endpoint to become ready...
