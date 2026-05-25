@@ -64,7 +64,8 @@ WORKDIR /var/www/html
 RUN ln -sf "$(which wkhtmltopdf)" /usr/local/bin/wkhtmltopdf 2>/dev/null || true
 
 COPY docker/offline/php/start-app.sh /usr/local/bin/start-app.sh
-RUN chmod +x /usr/local/bin/start-app.sh
+RUN sed -i 's/\r$//' /usr/local/bin/start-app.sh \
+ && chmod +x /usr/local/bin/start-app.sh
 
 EXPOSE 9000
 
