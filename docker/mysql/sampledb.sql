@@ -1,8 +1,8 @@
 -- MySQL dump 10.13  Distrib 8.0.43, for macos15 (arm64)
 --
--- Host: 127.0.0.1    Database: db
+-- Host: 127.0.0.1    Database: agrtl_offline
 -- ------------------------------------------------------
--- Server version	5.7.42-0ubuntu0.18.04.1-log
+-- Server version	5.7.44
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -48,7 +48,7 @@ CREATE TABLE `account` (
   KEY `account_store_id_index` (`store_id`),
   KEY `account_cust_id_index` (`CUST_ID`),
   KEY `account_accountid_index` (`ACCOUNTID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2548 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,50 +68,10 @@ CREATE TABLE `acctupdt_history` (
   `logreason_id` int(11) DEFAULT NULL,
   `logreason` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `store_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1692 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `acctupdtlog`
---
-
-DROP TABLE IF EXISTS `acctupdtlog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `acctupdtlog` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `ACCOUNTID` int(11) NOT NULL DEFAULT '0',
-  `CUST_ID` int(11) DEFAULT NULL,
-  `MODIDATE` date DEFAULT NULL,
-  `MODITIME` varchar(8) DEFAULT '',
-  `modidatetime` datetime DEFAULT NULL,
-  `EMPLOYEE` varchar(200) DEFAULT '',
-  `EMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `OTTLDUE` decimal(15,2) DEFAULT NULL,
-  `OCURRENT` decimal(15,2) DEFAULT NULL,
-  `OPREVBAL` decimal(15,2) DEFAULT NULL,
-  `OBALFOR` decimal(15,2) DEFAULT NULL,
-  `OTHIRTY` decimal(15,2) DEFAULT NULL,
-  `OSIXTY` decimal(15,2) DEFAULT NULL,
-  `ONINETY` decimal(15,2) DEFAULT NULL,
-  `O1TWENTY` decimal(15,2) DEFAULT NULL,
-  `NTTLDUE` decimal(15,2) DEFAULT NULL,
-  `NCURRENT` decimal(15,2) DEFAULT NULL,
-  `NPREVBAL` decimal(15,2) DEFAULT NULL,
-  `NBALFOR` decimal(15,2) DEFAULT NULL,
-  `NTHIRTY` decimal(15,2) DEFAULT NULL,
-  `NSIXTY` decimal(15,2) DEFAULT NULL,
-  `NNINETY` decimal(15,2) DEFAULT NULL,
-  `N1TWENTY` decimal(15,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `acctupdtlog_store_id_index` (`store_id`),
-  KEY `acctupdtlog_cust_id_index` (`CUST_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=144 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,331 +98,7 @@ CREATE TABLE `activity_log` (
   KEY `subject` (`subject_id`,`subject_type`),
   KEY `causer` (`causer_id`,`causer_type`),
   KEY `activity_log_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=169 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `adjitems`
---
-
-DROP TABLE IF EXISTS `adjitems`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `adjitems` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `ADJID` int(11) DEFAULT NULL,
-  `INVENID` int(11) DEFAULT NULL,
-  `ONHAND` decimal(15,3) DEFAULT NULL,
-  `COUNTAMNT` decimal(15,3) DEFAULT NULL,
-  `PLUSMINUS` decimal(15,3) DEFAULT NULL,
-  `COST` decimal(15,3) DEFAULT NULL,
-  `CATEGORYID` int(11) DEFAULT NULL,
-  `VENDORID` int(11) DEFAULT NULL,
-  `LUP_ID` int(11) DEFAULT NULL,
-  `LINENUM` bigint(20) DEFAULT NULL,
-  `PRICE` decimal(15,3) DEFAULT NULL,
-  `ADJMARKUP` decimal(11,2) DEFAULT NULL,
-  `ADJMARGIN` decimal(9,2) DEFAULT NULL,
-  `IHTAXRATE` varchar(255) DEFAULT NULL,
-  `IHNONTAXABLE` varchar(255) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `adjitems_store_id_index` (`store_id`),
-  KEY `adjitems_adjid_index` (`ADJID`),
-  KEY `adjitems_invenid_index` (`INVENID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2930 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `admin_role`
---
-
-DROP TABLE IF EXISTS `admin_role`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `admin_role` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `role_id` int(10) unsigned NOT NULL,
-  `admin_id` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `admin_role_admin_id_foreign` (`admin_id`),
-  CONSTRAINT `admin_role_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `admins`
---
-
-DROP TABLE IF EXISTS `admins`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `admins` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `ag2agprice`
---
-
-DROP TABLE IF EXISTS `ag2agprice`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ag2agprice` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `MATNO` varchar(14) DEFAULT '',
-  `FORMULA` varchar(14) DEFAULT '',
-  `PRODUCT` varchar(40) DEFAULT '',
-  `REF` varchar(10) DEFAULT '',
-  `PRODFORM` varchar(20) DEFAULT '',
-  `SIZE` varchar(20) DEFAULT '',
-  `PRICE` decimal(16,3) DEFAULT NULL,
-  `CHANGE` decimal(16,3) DEFAULT NULL,
-  `FULLTUNIT` decimal(16,3) DEFAULT NULL,
-  `TRUCKLOAD` decimal(16,3) DEFAULT NULL,
-  `BESTPRICE` decimal(16,3) DEFAULT NULL,
-  `COSTCHNG` tinyint(1) DEFAULT NULL,
-  `INVENCASE` bigint(20) DEFAULT NULL,
-  `INVENCOST` decimal(16,3) DEFAULT NULL,
-  `INVENMRKP` decimal(11,2) DEFAULT NULL,
-  `INVENPRICE` decimal(16,3) DEFAULT NULL,
-  `NEWPRICE` decimal(16,3) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ag2agprice_store_id_index` (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `analysisproductlist`
---
-
-DROP TABLE IF EXISTS `analysisproductlist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `analysisproductlist` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `PRODUCTNBR` varchar(15) DEFAULT '',
-  `PRODUCT` varchar(40) DEFAULT '',
-  `SPECIESGRP` varchar(30) DEFAULT '',
-  `METRICS` varchar(10) DEFAULT '',
-  `PRODDASH` varchar(10) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `analysisproductlist_store_id_index` (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `bcdinput`
---
-
-DROP TABLE IF EXISTS `bcdinput`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `bcdinput` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `BCD_ID` int(11) DEFAULT NULL,
-  `BCD_DATE` date DEFAULT NULL,
-  `BCD_DR_NO` varchar(2) DEFAULT '',
-  `BCD_EMP_NAME` varchar(255) DEFAULT NULL,
-  `BCD_EMP_ID` varchar(8) DEFAULT '',
-  `BCD_START` decimal(14,2) DEFAULT NULL,
-  `BCD_CASH` decimal(14,2) DEFAULT NULL,
-  `BCD_CHECK` decimal(14,2) DEFAULT NULL,
-  `BCD_CHARGE` decimal(14,2) DEFAULT NULL,
-  `BCD_CCCHAR` decimal(14,2) DEFAULT NULL,
-  `BCD_ACH` decimal(14,2) DEFAULT NULL,
-  `ACCT_RCVD` decimal(14,2) DEFAULT NULL,
-  `CASH_RCVD` decimal(14,2) DEFAULT NULL,
-  `CHECK_RCVD` decimal(14,2) DEFAULT NULL,
-  `CREDIT_RCV` decimal(14,2) DEFAULT NULL,
-  `ACH_RCVD` decimal(14,2) DEFAULT NULL,
-  `BCD_C_OUT` decimal(14,2) DEFAULT NULL,
-  `BCD_M_INC` decimal(14,2) DEFAULT NULL,
-  `BCD_DRAWER` decimal(14,2) DEFAULT NULL,
-  `COUNT_100` decimal(13,2) DEFAULT NULL,
-  `COUNT_50` decimal(13,2) DEFAULT NULL,
-  `COUNT_20` decimal(13,2) DEFAULT NULL,
-  `COUNT_10` decimal(13,2) DEFAULT NULL,
-  `COUNT_5` decimal(13,2) DEFAULT NULL,
-  `COUNT_1` decimal(13,2) DEFAULT NULL,
-  `COUNT_025` decimal(13,2) DEFAULT NULL,
-  `COUNT_010` decimal(13,2) DEFAULT NULL,
-  `COUNT_005` decimal(13,2) DEFAULT NULL,
-  `COUNT_001` decimal(13,2) DEFAULT NULL,
-  `TTL_CASH` decimal(14,2) DEFAULT NULL,
-  `TTL_CHECKS` decimal(14,2) DEFAULT NULL,
-  `TTL_DRAWER` decimal(14,2) DEFAULT NULL,
-  `DIFFERENCE` decimal(14,2) DEFAULT NULL,
-  `NDSB_100` decimal(13,2) DEFAULT NULL,
-  `NDSB_50` decimal(13,2) DEFAULT NULL,
-  `NDSB_20` decimal(13,2) DEFAULT NULL,
-  `NDSB_10` decimal(13,2) DEFAULT NULL,
-  `NDSB_5` decimal(13,2) DEFAULT NULL,
-  `NDSB_1` decimal(13,2) DEFAULT NULL,
-  `NDSB_025` decimal(13,2) DEFAULT NULL,
-  `NDSB_010` decimal(13,2) DEFAULT NULL,
-  `NDSB_005` decimal(13,2) DEFAULT NULL,
-  `NDSB_001` decimal(13,2) DEFAULT NULL,
-  `NDSB_TTL` decimal(14,2) DEFAULT NULL,
-  `NEXT_TTL` decimal(14,2) DEFAULT NULL,
-  `CASH_DEPO` decimal(14,2) DEFAULT NULL,
-  `CHECK_DEPO` decimal(14,2) DEFAULT NULL,
-  `MISC_DEPO` decimal(14,2) DEFAULT NULL,
-  `TTL_DEPO` decimal(14,2) DEFAULT NULL,
-  `DOUBLE_CHK` decimal(14,2) DEFAULT NULL,
-  `TTL_CREDIT` decimal(14,2) DEFAULT NULL,
-  `TTL_ACH` decimal(14,2) DEFAULT NULL,
-  `CNT_100` smallint(6) DEFAULT NULL,
-  `CNT_50` smallint(6) DEFAULT NULL,
-  `CNT_20` smallint(6) DEFAULT NULL,
-  `CNT_10` smallint(6) DEFAULT NULL,
-  `CNT_5` smallint(6) DEFAULT NULL,
-  `CNT_1` smallint(6) DEFAULT NULL,
-  `CNT_025` smallint(6) DEFAULT NULL,
-  `CNT_010` smallint(6) DEFAULT NULL,
-  `CNT_005` smallint(6) DEFAULT NULL,
-  `CNT_001` smallint(6) DEFAULT NULL,
-  `NXTCNT_100` smallint(6) DEFAULT NULL,
-  `NXTCNT_50` smallint(6) DEFAULT NULL,
-  `NXTCNT_20` smallint(6) DEFAULT NULL,
-  `NXTCNT_10` smallint(6) DEFAULT NULL,
-  `NXTCNT_5` smallint(6) DEFAULT NULL,
-  `NXTCNT_1` smallint(6) DEFAULT NULL,
-  `NXTCNT_025` smallint(6) DEFAULT NULL,
-  `NXTCNT_010` smallint(6) DEFAULT NULL,
-  `NXTCNT_005` smallint(6) DEFAULT NULL,
-  `NXTCNT_001` smallint(6) DEFAULT NULL,
-  `CASH` decimal(14,2) DEFAULT NULL,
-  `CASHDIFF` decimal(14,2) DEFAULT NULL,
-  `CHECKS` decimal(14,2) DEFAULT NULL,
-  `CHECKDIFF` decimal(14,2) DEFAULT NULL,
-  `CRDCARDS` decimal(14,2) DEFAULT NULL,
-  `ACH` decimal(14,2) DEFAULT NULL,
-  `CRDCDIFF` decimal(14,2) DEFAULT NULL,
-  `ACHDIFF` decimal(14,2) DEFAULT NULL,
-  `CTTL_CRD` decimal(14,2) DEFAULT NULL,
-  `DBL_CHKTTL` decimal(14,2) DEFAULT NULL,
-  `CTTL_DRWR` decimal(14,2) DEFAULT NULL,
-  `CTTL_ECASH` decimal(14,2) DEFAULT NULL,
-  `NXTDAYUPDT` decimal(14,2) DEFAULT NULL,
-  `NXTDAYDATE` date DEFAULT NULL,
-  `TTL_CPNS` decimal(14,2) DEFAULT NULL,
-  `CTTL_CPN` decimal(14,2) DEFAULT NULL,
-  `CPNDIFF` decimal(14,2) DEFAULT NULL,
-  `BCD_CPNS` decimal(14,2) DEFAULT NULL,
-  `COUPONS` decimal(14,2) DEFAULT NULL,
-  `MI_CASH` decimal(14,2) DEFAULT NULL,
-  `MI_CHECK` decimal(14,2) DEFAULT NULL,
-  `MI_CCARDS` decimal(14,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `BCD_GIFTC` decimal(14,2) DEFAULT NULL,
-  `GIFTCARDS` decimal(14,2) DEFAULT NULL,
-  `TTL_GIFT` decimal(14,2) DEFAULT NULL,
-  `GIFTDIFF` decimal(14,2) DEFAULT NULL,
-  `CTTL_GIFT` decimal(14,2) DEFAULT NULL,
-  `CTTL_ACH` decimal(14,2) DEFAULT NULL,
-  `is_sent_to_qb` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `bcdinput_store_id_index` (`store_id`),
-  KEY `bcdinput_bcd_id_index` (`BCD_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `billing`
---
-
-DROP TABLE IF EXISTS `billing`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `billing` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `BILL_ID` int(11) DEFAULT NULL,
-  `BILLINST_ID` int(11) NOT NULL DEFAULT '0',
-  `transdatetime` datetime DEFAULT NULL,
-  `BILL_DATE` date DEFAULT NULL,
-  `DUE_DATE` date DEFAULT NULL,
-  `CUST_ID` int(11) DEFAULT NULL,
-  `PAST_BAL` decimal(15,2) DEFAULT NULL,
-  `TTL_DUE` decimal(15,2) DEFAULT NULL,
-  `TRANSDATE` date DEFAULT NULL,
-  `TRANSTIME` varchar(10) DEFAULT '',
-  `ROANBR` int(11) DEFAULT NULL,
-  `ROATOTAL` decimal(15,2) DEFAULT NULL,
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `SLSTOTAL` decimal(15,2) DEFAULT NULL,
-  `SRVCHRG` tinyint(1) DEFAULT NULL,
-  `SPLTCHRGBA` tinyint(1) DEFAULT NULL,
-  `ROASURCHRG` decimal(7,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `billing_store_id_index` (`store_id`),
-  KEY `billing_bill_id_index` (`BILL_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=118995 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `billingtemp`
---
-
-DROP TABLE IF EXISTS `billingtemp`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `billingtemp` (
-  `CUST_ID` int(11) DEFAULT NULL,
-  `datetime` datetime NOT NULL,
-  `INVOICE_NBR` int(11) DEFAULT NULL,
-  `INVOICE_DATE` date DEFAULT NULL,
-  `INVOICE_TIME` varchar(8) DEFAULT '',
-  `invoicedatetime` datetime DEFAULT NULL,
-  `SLS_TOTAL` decimal(11,2) DEFAULT NULL,
-  `SRVCHRG` tinyint(1) DEFAULT NULL,
-  `ROANBR` int(11) DEFAULT NULL,
-  `ROADATE` date DEFAULT NULL,
-  `ROATIME` varchar(8) DEFAULT '',
-  `roadatetime` datetime DEFAULT NULL,
-  `ROATOTAL` decimal(11,2) DEFAULT NULL,
-  `TRANSDATE` date DEFAULT NULL,
-  `TRANSTIME` varchar(8) DEFAULT '',
-  `transdatetime` datetime DEFAULT NULL,
-  `SPLTBALANC` decimal(11,2) DEFAULT NULL,
-  `SPLTCRGBAL` tinyint(1) DEFAULT NULL,
-  `SCSIGIMAGE` blob,
-  `newacctbal` decimal(15,2) DEFAULT NULL,
-  `prvacctbal` decimal(15,2) DEFAULT NULL,
-  `surcharge` decimal(7,2) DEFAULT NULL,
-  `unique_id` int(11) NOT NULL DEFAULT '0',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1377 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -487,67 +123,7 @@ CREATE TABLE `blnginst` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `blnginst_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `cache`
---
-
-DROP TABLE IF EXISTS `cache`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `cache` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expiration` int(11) NOT NULL,
-  PRIMARY KEY (`key`),
-  KEY `cache_expiration_index` (`expiration`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `cache_locks`
---
-
-DROP TABLE IF EXISTS `cache_locks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `cache_locks` (
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `expiration` int(11) NOT NULL,
-  PRIMARY KEY (`key`),
-  KEY `cache_locks_expiration_index` (`expiration`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `cashout`
---
-
-DROP TABLE IF EXISTS `cashout`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `cashout` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `CASHOUTID` int(11) DEFAULT NULL,
-  `CODATE` date DEFAULT NULL,
-  `COTIME` varchar(8) DEFAULT '',
-  `codatetime` datetime DEFAULT NULL,
-  `CODRAWER` varchar(2) DEFAULT '',
-  `COEMPLOYEE` varchar(200) DEFAULT '',
-  `COEMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `COAMOUNT` decimal(13,2) DEFAULT NULL,
-  `COREASON` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `cashout_store_id_index` (`store_id`),
-  KEY `cashout_cashoutid_index` (`CASHOUTID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4260 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -575,7 +151,7 @@ CREATE TABLE `category` (
   PRIMARY KEY (`id`),
   KEY `category_store_id_index` (`store_id`),
   KEY `category_categoryid_index` (`CATEGORYID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1395 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4012 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -592,7 +168,7 @@ CREATE TABLE `cities` (
   `store_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `cities_id_index` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48759 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -616,7 +192,7 @@ CREATE TABLE `companies` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -647,7 +223,7 @@ CREATE TABLE `contracts` (
   PRIMARY KEY (`id`),
   KEY `contracts_store_id_index` (`store_id`),
   KEY `contracts_contractid_index` (`CONTRACTID`)
-) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=336 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -685,7 +261,7 @@ CREATE TABLE `custaddlist` (
   PRIMARY KEY (`id`),
   KEY `custaddlist_store_id_index` (`store_id`),
   KEY `custaddlist_custaddid_index` (`CUSTADDID`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -715,7 +291,7 @@ CREATE TABLE `custloyalty` (
   KEY `custloyalty_store_id_index` (`store_id`),
   KEY `custloyalty_loyaltyid_index` (`LOYALTYID`),
   KEY `custloyalty_employee_id_index` (`EMPLOYEE_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -738,8 +314,10 @@ CREATE TABLE `custom_logs` (
   `store_id` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5606 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`id`),
+  KEY `custom_logs_level_index` (`level`),
+  KEY `custom_logs_channel_index` (`channel`)
+) ENGINE=InnoDB AUTO_INCREMENT=13080524 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -776,8 +354,6 @@ CREATE TABLE `customer` (
   `CUST_MEMO` longtext,
   `CANCHRG` tinyint(1) DEFAULT '0',
   `CRDTLIMIT` decimal(13,2) DEFAULT NULL,
-  `CANINVOICE` tinyint(1) DEFAULT '0',
-  `PAYINVOICELIMIT` decimal(13,2) DEFAULT NULL,
   `CHRG_FNC` tinyint(1) DEFAULT NULL,
   `PRN_STMNT` tinyint(1) NOT NULL DEFAULT '0',
   `NONTAXABLE` tinyint(1) DEFAULT NULL,
@@ -861,15 +437,12 @@ CREATE TABLE `customer` (
   `STARTDATE` date DEFAULT NULL,
   `chg_type` varchar(45) DEFAULT NULL,
   `chg_startdate` datetime DEFAULT NULL,
-  `cc_token` text,
   `rank_sorting` int(11) DEFAULT NULL,
-  `multipledbcol` int(11) NOT NULL,
-  `multipledbcol2` int(11) NOT NULL,
+  `cc_token` text,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `chg_startdate_UNIQUE` (`chg_startdate`),
   KEY `customer_store_id_index` (`store_id`),
   KEY `customer_cust_id_index` (`CUST_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=33513 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=143962 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -880,16 +453,14 @@ DROP TABLE IF EXISTS `customer_invoice`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customer_invoice` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `station_id` int(11) NOT NULL,
   `TENDERED` double(8,2) DEFAULT NULL,
   `CHANGE` double(8,2) DEFAULT NULL,
   `TAXAMNT` double(8,2) NOT NULL,
   `SLSTOTAL` double(8,2) NOT NULL,
   `cash_rounding` decimal(6,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=302 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `store_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -900,7 +471,6 @@ DROP TABLE IF EXISTS `customer_invoiceitems`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customer_invoiceitems` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `station_id` int(11) NOT NULL,
   `tr_id` int(11) NOT NULL,
   `INVENTORYID` int(11) NOT NULL,
@@ -908,199 +478,8 @@ CREATE TABLE `customer_invoiceitems` (
   `DESCRIPTION` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `PRICE` decimal(8,3) NOT NULL,
   `EXTENDED` double(8,2) NOT NULL,
-  `store_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=416 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `edifilelog`
---
-
-DROP TABLE IF EXISTS `edifilelog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `edifilelog` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `VENDORID` int(11) DEFAULT NULL,
-  `FILENAME` varchar(240) DEFAULT '',
-  `MODIDNT` datetime DEFAULT NULL,
-  `DWNLDDIR` varchar(30) DEFAULT '',
-  `DWNLDDNT` datetime DEFAULT NULL,
-  `FILETYPE` varchar(20) DEFAULT '',
-  `PROCESSED` tinyint(1) DEFAULT NULL,
-  `PROCDNT` datetime DEFAULT NULL,
-  `VOUCHERNUM` int(11) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `edifilelog_store_id_index` (`store_id`),
-  KEY `edifilelog_vendorid_index` (`VENDORID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `editlog`
---
-
-DROP TABLE IF EXISTS `editlog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `editlog` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `ACTION` varchar(1) DEFAULT '',
-  `NAME` varchar(10) DEFAULT '',
-  `INVNUM` int(11) DEFAULT NULL,
-  `DATE` date DEFAULT NULL,
-  `TIME` varchar(8) DEFAULT '',
-  `datetime` datetime DEFAULT NULL,
-  `LOGIN` varchar(10) DEFAULT '',
-  `ATTEMPT` tinyint(1) DEFAULT NULL,
-  `COMPUTERID` varchar(30) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `editlog_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1165 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `emailsentlog`
---
-
-DROP TABLE IF EXISTS `emailsentlog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `emailsentlog` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `EMAIL_ID` int(11) DEFAULT NULL,
-  `SDATETIME` datetime DEFAULT NULL,
-  `SENTTO` varchar(250) DEFAULT '',
-  `SENTFROM` varchar(50) DEFAULT '',
-  `SUBJECT` varchar(50) DEFAULT '',
-  `CMESSAGE` longtext,
-  `ATT` longtext,
-  `NETNAME` varchar(50) DEFAULT '',
-  `LOGGEDIN` varchar(200) DEFAULT '',
-  `SENDFAIL` tinyint(1) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `pending` tinyint(1) NOT NULL DEFAULT '0',
-  `entityid` int(11) DEFAULT NULL,
-  `entityname` varchar(45) DEFAULT NULL,
-  `cc_email` varchar(60) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `emailsentlog_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14377 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `errorcap`
---
-
-DROP TABLE IF EXISTS `errorcap`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `errorcap` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `DATE` date DEFAULT NULL,
-  `TIME` varchar(8) DEFAULT '',
-  `ERRORNUM` varchar(5) DEFAULT '',
-  `ERRORMSG` varchar(200) DEFAULT '',
-  `PROGRAM` varchar(50) DEFAULT '',
-  `LINE` varchar(5) DEFAULT '',
-  `LINERELATV` varchar(5) DEFAULT '',
-  `ERRORCODE` varchar(200) DEFAULT '',
-  `DATAFILE` varchar(100) DEFAULT '',
-  `VARIABLE` varchar(20) DEFAULT '',
-  `MEMORY` varchar(10) DEFAULT '',
-  `ALLMEMORY` varchar(10) DEFAULT '',
-  `DISKSPACE` varchar(20) DEFAULT '',
-  `PROCESSOR` varchar(50) DEFAULT '',
-  `NETNAME` varchar(50) DEFAULT '',
-  `LOGGEDIN` varchar(10) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `errorcap_store_id_index` (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `external_order_line_items`
---
-
-DROP TABLE IF EXISTS `external_order_line_items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `external_order_line_items` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `shopify_line_item_id` bigint(20) unsigned DEFAULT NULL,
-  `order_id` bigint(20) unsigned NOT NULL,
-  `product_id` bigint(20) unsigned DEFAULT NULL,
-  `quantity_sold` int(11) DEFAULT NULL,
-  `inventory_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `variant_title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `price` decimal(10,2) DEFAULT NULL,
-  `sku` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `total_discount` decimal(10,2) DEFAULT NULL,
-  `tax_amount` decimal(10,2) DEFAULT NULL,
-  `tax_rate` decimal(5,4) DEFAULT NULL,
-  `tax_title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `order_line_items_order_id_foreign` (`order_id`),
-  CONSTRAINT `order_line_items_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `external_orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `external_orders`
---
-
-DROP TABLE IF EXISTS `external_orders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `external_orders` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `order_id` bigint(20) unsigned NOT NULL,
-  `order_number` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `order_date` datetime DEFAULT NULL,
-  `customer_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `customer_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `subtotal_price` decimal(10,2) DEFAULT NULL,
-  `total_tax` decimal(10,2) DEFAULT NULL,
-  `total_discounts` decimal(10,2) DEFAULT NULL,
-  `discount_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `discount_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `total_shipping_price` decimal(10,2) DEFAULT NULL,
-  `total_price` decimal(10,2) DEFAULT NULL,
-  `currency` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `financial_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `fulfillment_status` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `delivery_method` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cancel_reason` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cancelled_at` datetime DEFAULT NULL,
-  `note` text COLLATE utf8mb4_unicode_ci,
-  `processed` tinyint(1) NOT NULL DEFAULT '0',
-  `integration_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `store_id` int(11) NOT NULL,
-  `customer_id` bigint(20) unsigned DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `order_store_index` (`order_id`,`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `store_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1118,117 +497,7 @@ CREATE TABLE `failed_jobs` (
   `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `farmplan`
---
-
-DROP TABLE IF EXISTS `farmplan`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `farmplan` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `MRCHNTNBRS` longtext,
-  `DISCLOSURE` longtext,
-  `IVRPHONE` varchar(13) DEFAULT '',
-  `RVWPHONE` varchar(13) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `farmplan_store_id_index` (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `fcostlog`
---
-
-DROP TABLE IF EXISTS `fcostlog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `fcostlog` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `INVNUM` int(11) DEFAULT NULL,
-  `EMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `EMP_NAME` varchar(50) DEFAULT '',
-  `INVDATE` date DEFAULT NULL,
-  `INVTIME` varchar(8) DEFAULT '',
-  `invdatetime` datetime DEFAULT NULL,
-  `FIXDATE` date DEFAULT NULL,
-  `FIXTIME` varchar(8) DEFAULT '',
-  `fixdatetime` datetime DEFAULT NULL,
-  `ADJ_ITEM` varchar(30) DEFAULT '',
-  `ORIGCOST` decimal(18,5) DEFAULT NULL,
-  `FIXCOST` decimal(18,5) DEFAULT NULL,
-  `INVENID` int(11) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fcostlog_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1672 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `fpp_data`
---
-
-DROP TABLE IF EXISTS `fpp_data`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `fpp_data` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `FPP_ID` bigint(20) DEFAULT NULL,
-  `TYPE` varchar(10) DEFAULT '',
-  `INVEN_ID` int(11) DEFAULT NULL,
-  `BUY` smallint(6) DEFAULT NULL,
-  `FREE` tinyint(4) DEFAULT NULL,
-  `FPP_PNAME` varchar(30) DEFAULT '',
-  `SETUP_BY` varchar(8) DEFAULT '',
-  `SETUP_DATE` date DEFAULT NULL,
-  `SETUP_TIME` varchar(8) DEFAULT '',
-  `MODI_BY` varchar(8) DEFAULT '',
-  `MODI_DATE` date DEFAULT NULL,
-  `MODI_TIME` varchar(8) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fpp_data_store_id_index` (`store_id`),
-  KEY `fpp_data_fpp_id_index` (`FPP_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `gfkanalysis`
---
-
-DROP TABLE IF EXISTS `gfkanalysis`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `gfkanalysis` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `YEAR` smallint(6) DEFAULT NULL,
-  `WEEK` tinyint(4) DEFAULT NULL,
-  `STARTDATE` date DEFAULT NULL,
-  `ENDDATE` date DEFAULT NULL,
-  `EMPLOYEE` varchar(10) DEFAULT '',
-  `DATESENT` datetime DEFAULT NULL,
-  `SENT` tinyint(1) DEFAULT NULL,
-  `NOSALES` tinyint(1) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `gfkanalysis_store_id_index` (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1251,45 +520,6 @@ CREATE TABLE `giftcards` (
   PRIMARY KEY (`id`),
   KEY `giftcards_store_id_index` (`store_id`),
   KEY `giftcards_giftcardid_index` (`GIFTCARDID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `gunlog`
---
-
-DROP TABLE IF EXISTS `gunlog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `gunlog` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `GUNLOGID` int(11) DEFAULT NULL,
-  `GUNMAKE` varchar(30) DEFAULT '',
-  `MODEL` varchar(20) DEFAULT '',
-  `SERIALNBR` varchar(20) DEFAULT '',
-  `GUNTYPE` varchar(20) DEFAULT '',
-  `CALIBER` varchar(10) DEFAULT '',
-  `LOGDATE` date DEFAULT NULL,
-  `LOGTIME` varchar(8) DEFAULT '',
-  `VENDOR` longtext,
-  `SOLDDATE` date DEFAULT NULL,
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `SOLDTO` longtext,
-  `DOB` date DEFAULT NULL,
-  `IDNUMBER` varchar(20) DEFAULT '',
-  `ALIENDOC` varchar(20) DEFAULT '',
-  `FORM4473NO` int(11) DEFAULT NULL,
-  `EMPLOYEE` varchar(10) DEFAULT '',
-  `DELGUN` tinyint(1) DEFAULT NULL,
-  `DELBY` varchar(10) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `mdb1` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `gunlog_store_id_index` (`store_id`),
-  KEY `gunlog_gunlogid_index` (`GUNLOGID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1411,7 +641,7 @@ CREATE TABLE `hold` (
   PRIMARY KEY (`id`),
   KEY `hold_store_id_index` (`store_id`),
   KEY `hold_holdid_index` (`HOLDID`)
-) ENGINE=InnoDB AUTO_INCREMENT=175 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1425,13 +655,13 @@ CREATE TABLE `inputpayment_invoices` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `paymentnbr` int(11) NOT NULL,
   `invoicenbr` int(11) NOT NULL,
-  `apply_amount` decimal(13,2) NOT NULL,
+  `apply_amount` double(8,2) NOT NULL,
   `voided` tinyint(1) DEFAULT '0',
   `store_id` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=441 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1463,77 +693,6 @@ CREATE TABLE `inv_adj` (
   KEY `inv_adj_store_id_index` (`store_id`),
   KEY `inv_adj_adjid_index` (`ADJID`),
   KEY `inv_adj_employee_id_index` (`EMPLOYEE_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `inv_adv_field`
---
-
-DROP TABLE IF EXISTS `inv_adv_field`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `inv_adv_field` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `inventoryid` bigint(20) unsigned NOT NULL,
-  `shopify_title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `shopify_description` longtext COLLATE utf8mb4_unicode_ci,
-  `shopify_category` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `shopify_shipping` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `inv_adv_field_inventoryid_index` (`inventoryid`),
-  KEY `inv_adv_field_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `invaltuom`
---
-
-DROP TABLE IF EXISTS `invaltuom`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `invaltuom` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `INVENID` int(11) DEFAULT NULL,
-  `ALTQTYFCTR` decimal(18,5) DEFAULT NULL,
-  `ALTPRICE` decimal(16,3) DEFAULT NULL,
-  `ALTPRICEP` int(11) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `invaltuom_store_id_index` (`store_id`),
-  KEY `invaltuom_invenid_index` (`INVENID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `invenaltuom`
---
-
-DROP TABLE IF EXISTS `invenaltuom`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `invenaltuom` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `INVENID` int(11) DEFAULT NULL,
-  `ALTQTY` decimal(18,5) DEFAULT NULL,
-  `ALTRETAIL` decimal(16,3) DEFAULT NULL,
-  `ALTUOM` varchar(45) DEFAULT NULL,
-  `ALTMARKUP` decimal(16,3) DEFAULT NULL,
-  `ALTMARGIN` decimal(16,3) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `invaltuom_store_id_index` (`store_id`),
-  KEY `invaltuom_invenid_index` (`INVENID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1560,7 +719,7 @@ CREATE TABLE `invenplu` (
   KEY `invenplu_store_id_index` (`store_id`),
   KEY `plutype` (`PLUTYPE`),
   KEY `plu_store_id` (`PLU`,`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1302968 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4329 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1662,7 +821,6 @@ CREATE TABLE `inventory` (
   `newmargin` decimal(15,4) DEFAULT NULL,
   `newmarkup` decimal(15,4) DEFAULT NULL,
   `itemphoto` varchar(255) DEFAULT NULL,
-  `plunote_text` text,
   `trackserial` int(10) NOT NULL DEFAULT '0',
   `restricted` tinyint(1) NOT NULL DEFAULT '0',
   `allowrecurring` tinyint(1) DEFAULT '0',
@@ -1672,21 +830,21 @@ CREATE TABLE `inventory` (
   `item_locally` tinyint(1) NOT NULL DEFAULT '0',
   `item_shopify` tinyint(1) NOT NULL DEFAULT '0',
   `tobesync_shopify` tinyint(1) NOT NULL DEFAULT '0',
+  `tobesync` tinyint(1) NOT NULL DEFAULT '0',
+  `update_from` varchar(255) DEFAULT NULL,
+  `update_by_id` bigint(20) DEFAULT '0',
   `user_id` int(10) NOT NULL DEFAULT '0',
   `store_id` int(10) NOT NULL DEFAULT '0',
   `taxrate_id` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `tobesync` tinyint(1) NOT NULL DEFAULT '0',
-  `update_from` varchar(255) DEFAULT NULL,
-  `update_by_id` bigint(20) DEFAULT '0',
   `variant_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `inventory_store_id_index` (`store_id`),
   KEY `invenid_store_id` (`INVENTORYID`,`store_id`),
   KEY `inventory_variant_id_index` (`variant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=79739 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=520082 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1728,28 +886,7 @@ CREATE TABLE `inventory_history` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=51479 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `invlocation`
---
-
-DROP TABLE IF EXISTS `invlocation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `invlocation` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `INVLOCID` int(11) DEFAULT NULL,
-  `INVLOCDESC` varchar(200) DEFAULT '',
-  `store_id` int(11) DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `invlocation_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1875,11 +1012,12 @@ CREATE TABLE `invoice` (
   `xc_ref_number` varchar(255) DEFAULT NULL,
   `cc2_ref_number` varchar(255) DEFAULT NULL,
   `cash_rounding` decimal(6,2) DEFAULT NULL,
+  `is_sync` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `invoice_store_id_index` (`store_id`),
   KEY `invoice_invoicenbr_index` (`INVOICENBR`),
   KEY `invoice_tmp_invoicenbr_index` (`TMP_INVOICENBR`)
-) ENGINE=InnoDB AUTO_INCREMENT=3542 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1916,7 +1054,7 @@ CREATE TABLE `invoiceitems` (
   `LINENUM` int(11) DEFAULT NULL,
   `ORIGNONTAX` tinyint(1) DEFAULT NULL,
   `SERIALNBR` varchar(20) DEFAULT '',
-  `VND1ORDNUM` varchar(14) DEFAULT '',
+  `VND1ORDNUM` varchar(18) DEFAULT '',
   `RTLPRICE` decimal(16,3) DEFAULT NULL,
   `REWARDOK` tinyint(1) DEFAULT NULL,
   `VFDSLSID` int(11) DEFAULT NULL,
@@ -1939,7 +1077,7 @@ CREATE TABLE `invoiceitems` (
   PRIMARY KEY (`id`),
   KEY `invoiceitems_store_id_index` (`store_id`),
   KEY `invoiceitems_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB AUTO_INCREMENT=1627262 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1978,7 +1116,7 @@ CREATE TABLE `invupdt` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `invupdt_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=103623 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2000,30 +1138,7 @@ CREATE TABLE `invupdt_stock` (
   `user_id` int(11) DEFAULT NULL,
   `store_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1044 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `itemupc`
---
-
-DROP TABLE IF EXISTS `itemupc`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `itemupc` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `INVENID` int(11) DEFAULT NULL,
-  `UPC` varchar(14) DEFAULT '',
-  `UPCINACT` tinyint(1) DEFAULT NULL,
-  `ISPRIME` tinyint(1) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `itemupc_store_id_index` (`store_id`),
-  KEY `itemupc_invenid_index` (`INVENID`)
-) ENGINE=InnoDB AUTO_INCREMENT=143875 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2051,7 +1166,7 @@ CREATE TABLE `jdfinancial` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `jdfinancial_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2069,99 +1184,9 @@ CREATE TABLE `jobs` (
   `reserved_at` int(10) unsigned DEFAULT NULL,
   `available_at` int(10) unsigned NOT NULL,
   `created_at` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `kititems`
---
-
-DROP TABLE IF EXISTS `kititems`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `kititems` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `INVENID` int(11) DEFAULT NULL,
-  `QTY` decimal(16,3) DEFAULT NULL,
-  `AVGCOST` decimal(18,5) DEFAULT NULL,
-  `RETAIL` decimal(16,4) DEFAULT NULL,
-  `KITCOST` decimal(18,5) DEFAULT NULL,
-  `KITRETAIL` decimal(16,3) DEFAULT NULL,
-  `COSTPRCNT` decimal(14,4) DEFAULT NULL,
-  `CALCRETAIL` decimal(16,3) DEFAULT NULL,
-  `CALCCOST` decimal(16,3) DEFAULT NULL,
-  `INPUTRTL` decimal(16,3) DEFAULT '0.000',
-  `PRICEBY` varchar(10) DEFAULT '',
-  `KITLINENO` tinyint(4) DEFAULT NULL,
-  `KITID` int(11) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1551 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `kitsales`
---
-
-DROP TABLE IF EXISTS `kitsales`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `kitsales` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `KITID` int(11) DEFAULT NULL,
-  `INVENID` int(11) DEFAULT NULL,
-  `QTYSOLD` decimal(10,3) DEFAULT NULL,
-  `VENDORDNBR` varchar(16) DEFAULT NULL,
-  `KITITEMDSC` varchar(30) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `kk_files`
---
-
-DROP TABLE IF EXISTS `kk_files`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `kk_files` (
-  `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
-  `STATUS` int(1) NOT NULL DEFAULT '0',
-  `FILENAME` varchar(45) DEFAULT NULL,
-  `FILEPATH` varchar(100) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `latepay`
---
-
-DROP TABLE IF EXISTS `latepay`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `latepay` (
-  `id` bigint(20) unsigned NOT NULL,
-  `CUST_ID` int(11) DEFAULT NULL,
-  `TOTAL_DUE` decimal(15,2) DEFAULT NULL,
-  `DAYS_LATE` smallint(6) DEFAULT NULL,
-  `PREV_BAL` decimal(15,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2175,7 +1200,7 @@ CREATE TABLE `logonlog` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `CURLOGGED` varchar(10) DEFAULT '',
   `CURLOGGED_ID` int(11) DEFAULT NULL,
-  `LOGDATETIME` date DEFAULT NULL,
+  `LOGDATETIME` datetime DEFAULT NULL,
   `LOGIN` varchar(60) DEFAULT '',
   `LOGIN_ID` int(11) DEFAULT NULL,
   `SUCCESS` tinyint(1) DEFAULT NULL,
@@ -2190,8 +1215,8 @@ CREATE TABLE `logonlog` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17343 DEFAULT CHARSET=utf8;
+  KEY `logonlog_store_id_index` (`store_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6541518 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2202,56 +1227,18 @@ DROP TABLE IF EXISTS `lupcodes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `lupcodes` (
-  `id` bigint(20) unsigned NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `LUP_ID` int(11) DEFAULT NULL,
   `LUP_NAME` varchar(20) DEFAULT '',
   `store_id` int(10) NOT NULL DEFAULT '0',
   `user_id` int(10) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `masterct`
---
-
-DROP TABLE IF EXISTS `masterct`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `masterct` (
-  `id` int(11) NOT NULL,
-  `MASTER_ID` bigint(20) unsigned DEFAULT NULL,
-  `MASTERNAME` varchar(25) DEFAULT '',
-  `store_id` int(10) NOT NULL DEFAULT '0',
-  `created_by` int(10) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `messages`
---
-
-DROP TABLE IF EXISTS `messages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `messages` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `user_to_id` int(11) NOT NULL,
-  `user_from_id` int(11) NOT NULL,
-  `message_text` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_new` tinyint(1) NOT NULL DEFAULT '1',
-  `store_id` int(11) NOT NULL,
-  `read_datetime` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=116 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`id`),
+  KEY `lupcodes_store_id_index` (`store_id`),
+  KEY `lupcodes_lup_id_index` (`LUP_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7147 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2266,910 +1253,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=473 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `miscincome`
---
-
-DROP TABLE IF EXISTS `miscincome`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `miscincome` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `MISCINCID` int(11) DEFAULT NULL,
-  `MIDATE` date DEFAULT NULL,
-  `MITIME` varchar(8) DEFAULT '',
-  `midatetime` datetime DEFAULT NULL,
-  `MIDRAWER` varchar(2) DEFAULT '',
-  `MIEMPLOYEE` varchar(200) DEFAULT '',
-  `MIEMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `MIAMOUNT` decimal(13,2) DEFAULT NULL,
-  `MICASH` tinyint(1) DEFAULT NULL,
-  `MICHECK` tinyint(1) DEFAULT NULL,
-  `MICHKNMBR` varchar(6) DEFAULT '',
-  `MICCARD` tinyint(1) DEFAULT NULL,
-  `MICRDTTYPE` varchar(16) DEFAULT '',
-  `MIREASON` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `xc_ref_number` varchar(255) DEFAULT NULL,
-  `cc2_ref_number` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mnth_cap`
---
-
-DROP TABLE IF EXISTS `mnth_cap`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mnth_cap` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `STARTDATE` date DEFAULT NULL,
-  `ENDDATE` date DEFAULT NULL,
-  `GRD_TTL` decimal(20,2) DEFAULT NULL,
-  `TTL_PREV` decimal(20,2) DEFAULT NULL,
-  `TTL_CUR` decimal(20,2) DEFAULT NULL,
-  `TTL_30` decimal(20,2) DEFAULT NULL,
-  `TTL_60` decimal(20,2) DEFAULT NULL,
-  `TTL_90` decimal(20,2) DEFAULT NULL,
-  `TTL_120` decimal(20,2) DEFAULT NULL,
-  `TTL_AVG_CO` decimal(20,2) DEFAULT NULL,
-  `COST` decimal(20,2) DEFAULT NULL,
-  `PRICE` decimal(20,2) DEFAULT NULL,
-  `DISCOUNT` decimal(20,2) DEFAULT NULL,
-  `EXTENDED` decimal(20,2) DEFAULT NULL,
-  `PROFIT` decimal(20,2) DEFAULT NULL,
-  `MARKUP` decimal(20,2) DEFAULT NULL,
-  `TAXRATE` varchar(5) DEFAULT '',
-  `SUBTOTAL` decimal(20,2) DEFAULT NULL,
-  `TOTAL` decimal(20,2) DEFAULT NULL,
-  `TAX` decimal(20,2) DEFAULT NULL,
-  `TAXABLE` decimal(20,2) DEFAULT NULL,
-  `NTAXABLE` decimal(20,2) DEFAULT NULL,
-  `MARGIN` decimal(20,2) DEFAULT NULL,
-  `TIME` varchar(8) DEFAULT '',
-  `TTLRTLVAL` decimal(20,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_authentication`
---
-
-DROP TABLE IF EXISTS `mydbr_authentication`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_authentication` (
-  `module` varchar(20) NOT NULL,
-  `mask` int(11) NOT NULL,
-  `name` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_favourite_folders`
---
-
-DROP TABLE IF EXISTS `mydbr_favourite_folders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_favourite_folders` (
-  `id` int(11) NOT NULL,
-  `user` varchar(128) DEFAULT NULL,
-  `authentication` int(11) NOT NULL,
-  `folder_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_favourite_reports`
---
-
-DROP TABLE IF EXISTS `mydbr_favourite_reports`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_favourite_reports` (
-  `id` int(11) NOT NULL,
-  `user` varchar(128) DEFAULT NULL,
-  `authentication` int(11) NOT NULL,
-  `report_id` int(11) NOT NULL,
-  `url` varchar(512) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_folders`
---
-
-DROP TABLE IF EXISTS `mydbr_folders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_folders` (
-  `folder_id` int(11) NOT NULL,
-  `mother_id` int(11) DEFAULT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  `invisible` tinyint(4) DEFAULT NULL,
-  `reportgroup` int(11) NOT NULL DEFAULT '1',
-  `explanation` varchar(4096) DEFAULT NULL,
-  `icon` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_folders_priv`
---
-
-DROP TABLE IF EXISTS `mydbr_folders_priv`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_folders_priv` (
-  `id` int(11) NOT NULL,
-  `folder_id` int(11) NOT NULL,
-  `username` varchar(128) NOT NULL,
-  `group_id` int(11) NOT NULL,
-  `authentication` int(11) NOT NULL,
-  `organization_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_geocode`
---
-
-DROP TABLE IF EXISTS `mydbr_geocode`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_geocode` (
-  `md5hash` char(32) NOT NULL,
-  `latitude` decimal(12,9) DEFAULT NULL,
-  `longitude` decimal(12,9) DEFAULT NULL,
-  `address` varchar(1000) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_groups`
---
-
-DROP TABLE IF EXISTS `mydbr_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_groups` (
-  `group_id` int(11) NOT NULL,
-  `name` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_groupsusers`
---
-
-DROP TABLE IF EXISTS `mydbr_groupsusers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_groupsusers` (
-  `group_id` int(11) NOT NULL,
-  `user` varchar(128) NOT NULL,
-  `authentication` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_key_column_usage`
---
-
-DROP TABLE IF EXISTS `mydbr_key_column_usage`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_key_column_usage` (
-  `table_schema` varchar(64) NOT NULL,
-  `table_name` varchar(64) NOT NULL,
-  `column_name` varchar(64) NOT NULL,
-  `referenced_table_schema` varchar(64) DEFAULT NULL,
-  `referenced_table_name` varchar(64) DEFAULT NULL,
-  `referenced_column_name` varchar(64) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_languages`
---
-
-DROP TABLE IF EXISTS `mydbr_languages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_languages` (
-  `lang_locale` char(5) NOT NULL,
-  `language` varchar(30) DEFAULT NULL,
-  `date_format` varchar(10) DEFAULT NULL,
-  `time_format` varchar(10) DEFAULT NULL,
-  `thousand_separator` varchar(2) DEFAULT NULL,
-  `decimal_separator` varchar(2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_licenses`
---
-
-DROP TABLE IF EXISTS `mydbr_licenses`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_licenses` (
-  `id` int(11) NOT NULL,
-  `owner` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `company` varchar(255) NOT NULL,
-  `host` varchar(255) NOT NULL,
-  `license_key` varchar(80) NOT NULL,
-  `db` varchar(10) NOT NULL,
-  `expiration` date NOT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `version` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_localization`
---
-
-DROP TABLE IF EXISTS `mydbr_localization`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_localization` (
-  `lang_locale` char(5) NOT NULL,
-  `keyword` varchar(50) NOT NULL,
-  `translation` varchar(1024) DEFAULT NULL,
-  `creation_date` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_log`
---
-
-DROP TABLE IF EXISTS `mydbr_log`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_log` (
-  `id` int(11) NOT NULL,
-  `user` varchar(128) DEFAULT NULL,
-  `log_time` datetime DEFAULT NULL,
-  `log_ip` varchar(40) DEFAULT NULL,
-  `log_title` varchar(30) DEFAULT NULL,
-  `log_message` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_login_fail_blocks`
---
-
-DROP TABLE IF EXISTS `mydbr_login_fail_blocks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_login_fail_blocks` (
-  `id` int(11) NOT NULL,
-  `ip_address` varchar(39) DEFAULT NULL,
-  `blocked_until` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_login_fail_log`
---
-
-DROP TABLE IF EXISTS `mydbr_login_fail_log`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_login_fail_log` (
-  `id` int(11) NOT NULL,
-  `type` int(11) DEFAULT NULL,
-  `ip_address` varchar(39) DEFAULT NULL,
-  `username` varchar(128) NOT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `user_agent_hash` varchar(50) DEFAULT NULL,
-  `ad_domain_controller` varchar(255) DEFAULT NULL,
-  `info` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_notifications`
---
-
-DROP TABLE IF EXISTS `mydbr_notifications`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_notifications` (
-  `id` int(11) NOT NULL,
-  `notification` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_options`
---
-
-DROP TABLE IF EXISTS `mydbr_options`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_options` (
-  `user` varchar(128) NOT NULL,
-  `authentication` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(30) NOT NULL,
-  `value` varchar(512) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_organizations`
---
-
-DROP TABLE IF EXISTS `mydbr_organizations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_organizations` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `external_id` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_param_queries`
---
-
-DROP TABLE IF EXISTS `mydbr_param_queries`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_param_queries` (
-  `name` varchar(50) NOT NULL,
-  `query` varchar(4096) DEFAULT NULL,
-  `coltype` tinyint(4) NOT NULL,
-  `options` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_params`
---
-
-DROP TABLE IF EXISTS `mydbr_params`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_params` (
-  `proc_name` varchar(100) NOT NULL,
-  `param` varchar(100) NOT NULL,
-  `query_name` varchar(50) DEFAULT NULL,
-  `title` varchar(255) DEFAULT NULL,
-  `default_value` varchar(50) DEFAULT NULL,
-  `optional` int(11) NOT NULL DEFAULT '0',
-  `only_default` int(11) NOT NULL DEFAULT '0',
-  `suffix` varchar(255) DEFAULT NULL,
-  `options` varchar(1024) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_password_reset`
---
-
-DROP TABLE IF EXISTS `mydbr_password_reset`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_password_reset` (
-  `user` varchar(128) NOT NULL,
-  `perishable_token` varchar(128) NOT NULL,
-  `request_time` datetime NOT NULL,
-  `ip_address` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_progress`
---
-
-DROP TABLE IF EXISTS `mydbr_progress`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_progress` (
-  `id` int(11) NOT NULL,
-  `task` varchar(20) NOT NULL,
-  `maximum` int(11) DEFAULT NULL,
-  `value` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_remote_servers`
---
-
-DROP TABLE IF EXISTS `mydbr_remote_servers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_remote_servers` (
-  `id` int(11) NOT NULL,
-  `server` varchar(128) NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `hash` varchar(40) NOT NULL,
-  `username` varchar(128) NOT NULL,
-  `password` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_report_extensions`
---
-
-DROP TABLE IF EXISTS `mydbr_report_extensions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_report_extensions` (
-  `proc_name` varchar(100) NOT NULL,
-  `extension` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_reportgroups`
---
-
-DROP TABLE IF EXISTS `mydbr_reportgroups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_reportgroups` (
-  `id` int(11) NOT NULL,
-  `name` varchar(128) NOT NULL,
-  `sortorder` int(11) NOT NULL,
-  `color` char(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_reports`
---
-
-DROP TABLE IF EXISTS `mydbr_reports`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_reports` (
-  `report_id` int(11) NOT NULL,
-  `name` varchar(150) NOT NULL,
-  `proc_name` varchar(100) NOT NULL,
-  `folder_id` int(11) NOT NULL,
-  `explanation` varchar(4096) DEFAULT NULL,
-  `reportgroup` int(11) NOT NULL DEFAULT '1',
-  `sortorder` int(11) DEFAULT NULL,
-  `runreport` varchar(50) DEFAULT NULL,
-  `autoexecute` tinyint(4) DEFAULT NULL,
-  `parameter_help` varchar(10000) DEFAULT NULL,
-  `export` varchar(10) DEFAULT NULL,
-  `icon` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_reports_priv`
---
-
-DROP TABLE IF EXISTS `mydbr_reports_priv`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_reports_priv` (
-  `id` int(11) NOT NULL,
-  `report_id` int(11) NOT NULL,
-  `username` varchar(128) DEFAULT NULL,
-  `group_id` int(11) NOT NULL,
-  `authentication` int(11) NOT NULL,
-  `organization_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_scheduled_tasks`
---
-
-DROP TABLE IF EXISTS `mydbr_scheduled_tasks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_scheduled_tasks` (
-  `id` int(11) NOT NULL,
-  `description` varchar(2028) DEFAULT NULL,
-  `url` varchar(2028) DEFAULT NULL,
-  `timing` varchar(255) NOT NULL,
-  `last_run` datetime DEFAULT NULL,
-  `disabled` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_snippets`
---
-
-DROP TABLE IF EXISTS `mydbr_snippets`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_snippets` (
-  `id` int(11) NOT NULL,
-  `name` varchar(30) DEFAULT NULL,
-  `code` text,
-  `shortcut` varchar(20) DEFAULT NULL,
-  `cright` int(11) DEFAULT NULL,
-  `cdown` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_statistics`
---
-
-DROP TABLE IF EXISTS `mydbr_statistics`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_statistics` (
-  `proc_name` varchar(100) NOT NULL,
-  `username` varchar(128) DEFAULT NULL,
-  `authentication` int(11) NOT NULL,
-  `start_time` datetime NOT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `query` longtext,
-  `ip_address` varchar(255) DEFAULT NULL,
-  `user_agent_hash` varchar(50) DEFAULT NULL,
-  `id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_styles`
---
-
-DROP TABLE IF EXISTS `mydbr_styles`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_styles` (
-  `name` varchar(30) NOT NULL,
-  `colstyle` tinyint(4) NOT NULL,
-  `definition` varchar(400) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_sync_exclude`
---
-
-DROP TABLE IF EXISTS `mydbr_sync_exclude`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_sync_exclude` (
-  `username` varchar(128) NOT NULL,
-  `authentication` int(11) NOT NULL,
-  `proc_name` varchar(100) NOT NULL,
-  `type` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_template_folders`
---
-
-DROP TABLE IF EXISTS `mydbr_template_folders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_template_folders` (
-  `id` int(11) NOT NULL,
-  `name` varchar(128) DEFAULT NULL,
-  `parent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_templates`
---
-
-DROP TABLE IF EXISTS `mydbr_templates`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_templates` (
-  `id` int(11) NOT NULL,
-  `name` varchar(128) NOT NULL,
-  `header` text,
-  `rowdata` text,
-  `footer` text,
-  `folder_id` int(11) DEFAULT NULL,
-  `creation_date` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_twofa_secrets`
---
-
-DROP TABLE IF EXISTS `mydbr_twofa_secrets`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_twofa_secrets` (
-  `provider` varchar(100) NOT NULL,
-  `username` varchar(128) NOT NULL,
-  `authentication` int(11) NOT NULL,
-  `secret` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_ui_category_collapse`
---
-
-DROP TABLE IF EXISTS `mydbr_ui_category_collapse`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_ui_category_collapse` (
-  `username` varchar(128) NOT NULL,
-  `authentication` int(11) NOT NULL,
-  `mother_id` int(11) NOT NULL,
-  `reportgroup` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_update`
---
-
-DROP TABLE IF EXISTS `mydbr_update`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_update` (
-  `latest_version` varchar(10) NOT NULL,
-  `next_check` int(11) DEFAULT NULL,
-  `download_link` varchar(200) DEFAULT NULL,
-  `info_link` varchar(200) DEFAULT NULL,
-  `last_successful_check` int(11) DEFAULT NULL,
-  `signature` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_user_agents`
---
-
-DROP TABLE IF EXISTS `mydbr_user_agents`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_user_agents` (
-  `hash` varchar(50) NOT NULL,
-  `user_agent` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_user_logins`
---
-
-DROP TABLE IF EXISTS `mydbr_user_logins`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_user_logins` (
-  `username` varchar(128) NOT NULL,
-  `authentication` int(11) NOT NULL,
-  `session_hash` varchar(40) NOT NULL,
-  `login_at` datetime DEFAULT NULL,
-  `logout_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_userlogin`
---
-
-DROP TABLE IF EXISTS `mydbr_userlogin`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_userlogin` (
-  `user` varchar(128) NOT NULL,
-  `password` char(255) DEFAULT NULL,
-  `name` varchar(60) DEFAULT NULL,
-  `admin` tinyint(4) NOT NULL DEFAULT '0',
-  `passworddate` datetime DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `telephone` varchar(100) DEFAULT NULL,
-  `authentication` int(11) NOT NULL DEFAULT '2',
-  `ask_pw_change` int(11) NOT NULL DEFAULT '0',
-  `organization_id` int(11) DEFAULT NULL,
-  `disabled` tinyint(4) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mydbr_version`
---
-
-DROP TABLE IF EXISTS `mydbr_version`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `mydbr_version` (
-  `version` varchar(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `ocr_vendors`
---
-
-DROP TABLE IF EXISTS `ocr_vendors`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ocr_vendors` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `field_mappings` longtext COLLATE utf8mb4_unicode_ci,
-  `all_fields` longtext COLLATE utf8mb4_unicode_ci,
-  `uploaded_file` text COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) DEFAULT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '1',
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pdfco',
-  `text_context` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `offline_sales`
---
-
-DROP TABLE IF EXISTS `offline_sales`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `offline_sales` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `store_id` int(10) unsigned DEFAULT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `items_count` int(10) unsigned NOT NULL DEFAULT '0',
-  `total` decimal(12,2) NOT NULL DEFAULT '0.00',
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `synced` tinyint(1) NOT NULL DEFAULT '0',
-  `synced_at` datetime DEFAULT NULL,
-  `source` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'offline',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `offline_sales_uuid_unique` (`uuid`),
-  KEY `offline_sales_store_id_index` (`store_id`),
-  KEY `offline_sales_user_id_index` (`user_id`),
-  KEY `offline_sales_synced_index` (`synced`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `orgillcatalog`
---
-
-DROP TABLE IF EXISTS `orgillcatalog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orgillcatalog` (
-  `id` bigint(20) unsigned NOT NULL,
-  `ORGILLSKU` varchar(8) DEFAULT '',
-  `ITEMDESC` varchar(30) DEFAULT '',
-  `UPC11DIGIT` varchar(11) DEFAULT '',
-  `PLVL1COST` decimal(16,3) DEFAULT NULL,
-  `VP1COST` decimal(16,3) DEFAULT NULL,
-  `VP2COST` decimal(16,3) DEFAULT NULL,
-  `ADVCOST` decimal(16,3) DEFAULT NULL,
-  `SUGRETAIL` decimal(16,3) DEFAULT NULL,
-  `SELLUOM` varchar(5) DEFAULT '',
-  `WEIGHT` decimal(13,3) DEFAULT NULL,
-  `BREAKPACK` tinyint(1) DEFAULT NULL,
-  `MINORDQTY` int(11) DEFAULT NULL,
-  `DIVISION` smallint(6) DEFAULT NULL,
-  `BUYINGDEPT` varchar(1) DEFAULT '',
-  `RPTGROUP` varchar(3) DEFAULT '',
-  `RTLCLASS` int(11) DEFAULT NULL,
-  `CATPGNO` varchar(8) DEFAULT '',
-  `VENDORNBR` varchar(30) DEFAULT NULL,
-  `FACTORYNBR` varchar(17) DEFAULT '',
-  `RETAILUOM` varchar(5) DEFAULT '',
-  `RTLCONVFLG` varchar(1) DEFAULT '',
-  `RTLCONVFCT` int(11) DEFAULT NULL,
-  `RTLSNSCODE` varchar(1) DEFAULT '',
-  `QTYRNDOPT` varchar(1) DEFAULT '',
-  `RECCHNGFLG` varchar(1) DEFAULT '',
-  `SHELFPACK` int(11) DEFAULT NULL,
-  `RTLUPCNBR` varchar(14) DEFAULT '',
-  `UPC12DIGIT` varchar(12) DEFAULT '',
-  `UPCFILLER` varchar(2) DEFAULT '',
-  `DSCONTNUED` tinyint(1) DEFAULT NULL,
-  `DSCONDATE` date DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  KEY `idx_orgillcatalog_sku_store` (`ORGILLSKU`,`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `orgillclass`
---
-
-DROP TABLE IF EXISTS `orgillclass`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orgillclass` (
-  `id` bigint(20) unsigned NOT NULL,
-  `DEPT` varchar(8) DEFAULT '',
-  `DEPTDESC` varchar(23) DEFAULT '',
-  `CLASS` varchar(8) DEFAULT '',
-  `CLASSDESC` varchar(32) DEFAULT '',
-  `RTLCLS` varchar(8) DEFAULT '',
-  `RTLCLSDESC` varchar(32) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `orgillfm`
---
-
-DROP TABLE IF EXISTS `orgillfm`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orgillfm` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `ORGILLSKU` varchar(8) DEFAULT '',
-  `ITEMDESC` varchar(30) DEFAULT '',
-  `UPC11DIGIT` varchar(11) DEFAULT '',
-  `PLVL1COST` decimal(16,3) DEFAULT NULL,
-  `VP1COST` decimal(16,3) DEFAULT NULL,
-  `VP2COST` decimal(16,3) DEFAULT NULL,
-  `ADVCOST` decimal(16,3) DEFAULT NULL,
-  `SUGRETAIL` decimal(16,3) DEFAULT NULL,
-  `SELLUOM` varchar(5) DEFAULT '',
-  `WEIGHT` decimal(13,3) DEFAULT NULL,
-  `BREAKPACK` tinyint(1) DEFAULT NULL,
-  `MINORDQTY` int(11) DEFAULT NULL,
-  `DIVISION` smallint(6) DEFAULT NULL,
-  `BUYINGDEPT` varchar(1) DEFAULT '',
-  `RPTGROUP` varchar(3) DEFAULT '',
-  `RTLCLASS` int(11) DEFAULT NULL,
-  `CATPGNO` varchar(8) DEFAULT '',
-  `VENDORNBR` varchar(30) DEFAULT NULL,
-  `FACTORYNBR` varchar(17) DEFAULT '',
-  `RETAILUOM` varchar(5) DEFAULT '',
-  `RTLCONVFLG` varchar(1) DEFAULT '',
-  `RTLCONVFCT` int(11) DEFAULT NULL,
-  `RTLSNSCODE` varchar(1) DEFAULT '',
-  `QTYRNDOPT` varchar(1) DEFAULT '',
-  `RECCHNGFLG` varchar(1) DEFAULT '',
-  `SHELFPACK` int(11) DEFAULT NULL,
-  `RTLUPCNBR` varchar(14) DEFAULT '',
-  `UPC12DIGIT` varchar(12) DEFAULT '',
-  `UPCFILLER` varchar(2) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_orgillfm_sku_store` (`ORGILLSKU`,`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1626 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=388 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3180,11 +1264,12 @@ DROP TABLE IF EXISTS `password_resets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `password_resets` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `token` varchar(200) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3210,39 +1295,9 @@ CREATE TABLE `pax_logs` (
   `store_id` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `status_msg` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status_msg` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4099 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `payables`
---
-
-DROP TABLE IF EXISTS `payables`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `payables` (
-  `id` bigint(20) unsigned NOT NULL,
-  `PAYABLEID` int(11) DEFAULT NULL,
-  `VENDORID` int(11) DEFAULT NULL,
-  `AMOUNT` decimal(15,2) DEFAULT NULL,
-  `INVNBR` varchar(15) DEFAULT '',
-  `VOUCHERID` int(11) DEFAULT NULL,
-  `PYBLDATE` date DEFAULT NULL,
-  `PYBLTIME` varchar(8) DEFAULT '',
-  `DUEDATE` date DEFAULT NULL,
-  `PAIDDATE` date DEFAULT NULL,
-  `TRANSTYPE` varchar(10) DEFAULT '',
-  `CHECKNBR` varchar(10) DEFAULT '',
-  `EMPLOYEE` varchar(255) DEFAULT '',
-  `EMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `qb_bill_id` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3266,7 +1321,7 @@ CREATE TABLE `paybyinv_activity` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3302,7 +1357,7 @@ CREATE TABLE `paybyinv_invoice` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3327,777 +1382,6 @@ CREATE TABLE `paybyinv_payment` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `payment`
---
-
-DROP TABLE IF EXISTS `payment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `payment` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `ROANBR` int(11) DEFAULT NULL,
-  `ROADATE` date DEFAULT NULL,
-  `ROATIME` varchar(8) DEFAULT '',
-  `raodatetime` datetime DEFAULT NULL,
-  `CUST_ID` int(11) DEFAULT NULL,
-  `EMPLOYEE` varchar(255) DEFAULT NULL,
-  `EMP_ID` varchar(8) DEFAULT '',
-  `ROATOTAL` decimal(15,2) DEFAULT NULL,
-  `CASH_AMT` decimal(15,2) DEFAULT NULL,
-  `CHECK_AMT` decimal(15,2) DEFAULT NULL,
-  `ACH_AMT` decimal(9,2) NOT NULL DEFAULT '0.00',
-  `CHECK_NBR` varchar(6) DEFAULT '',
-  `ACH_REQUEST_ID` varchar(30) DEFAULT NULL,
-  `CREDIT_AMT` decimal(15,2) DEFAULT NULL,
-  `CC_TYPE` varchar(16) DEFAULT '',
-  `DRAWER` varchar(2) DEFAULT '',
-  `NOTE` longtext,
-  `BILL_ID` int(11) DEFAULT NULL,
-  `PRVACCTBAL` decimal(15,2) DEFAULT NULL,
-  `NEWACCTBAL` decimal(15,2) DEFAULT NULL,
-  `XCACCOUNT` varchar(20) DEFAULT '',
-  `XCAPPROVAL` varchar(15) DEFAULT '',
-  `XCCARDTYPE` varchar(20) DEFAULT '',
-  `XCNAME` varchar(35) DEFAULT '',
-  `XCSIGIMAGE` longtext,
-  `XCTRANSID` varchar(50) DEFAULT '',
-  `XCEXPIRE` varchar(10) DEFAULT '',
-  `XCACCNTID` varchar(255) DEFAULT '',
-  `XCCARDBAL` decimal(14,2) DEFAULT NULL,
-  `COMPUTERID` varchar(30) DEFAULT '',
-  `ROAADJUST` decimal(15,2) DEFAULT NULL,
-  `VOIDED` tinyint(1) DEFAULT NULL,
-  `VOIDEDBY` varchar(10) DEFAULT '',
-  `voiddatetime` datetime DEFAULT NULL,
-  `VOIDDATE` date DEFAULT NULL,
-  `VOIDTIME` varchar(8) DEFAULT '',
-  `VOIDID` varchar(10) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `SURCHARGE` decimal(15,2) DEFAULT NULL,
-  `EMAILTO` varchar(100) DEFAULT NULL,
-  `AVSRESPNS` varchar(100) DEFAULT NULL,
-  `CSVRESPNS` varchar(100) DEFAULT NULL,
-  `is_used` tinyint(1) DEFAULT NULL,
-  `xc_processor` tinyint(1) DEFAULT NULL,
-  `XCTSI` varchar(50) DEFAULT NULL,
-  `XCTVR` varchar(50) DEFAULT NULL,
-  `XCAID` varchar(50) DEFAULT NULL,
-  `XCAPPLBL` varchar(100) DEFAULT NULL,
-  `XCENTRYMD` varchar(50) DEFAULT NULL,
-  `xc_ref_number` varchar(255) DEFAULT NULL,
-  `cc2_ref_number` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7882 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `pdfinstall`
---
-
-DROP TABLE IF EXISTS `pdfinstall`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pdfinstall` (
-  `id` bigint(20) unsigned NOT NULL,
-  `FILENAME` varchar(120) DEFAULT '',
-  `DIR` varchar(10) DEFAULT '',
-  `CONTENTS` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `permissions`
---
-
-DROP TABLE IF EXISTS `permissions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `permissions` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `key` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `poitems`
---
-
-DROP TABLE IF EXISTS `poitems`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `poitems` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `POID` int(11) DEFAULT NULL,
-  `POINVENID` int(11) DEFAULT NULL,
-  `VNDORDNUM` varchar(14) DEFAULT '',
-  `QTY2ORDER` decimal(15,3) DEFAULT NULL,
-  `ONHAND` decimal(15,3) DEFAULT NULL,
-  `QTYSOLD` decimal(15,3) DEFAULT NULL,
-  `CATEGORYID` int(11) DEFAULT NULL,
-  `WEIGHT` decimal(13,3) DEFAULT NULL,
-  `CASEQTY` smallint(6) DEFAULT NULL,
-  `INACTIVE` tinyint(1) DEFAULT NULL,
-  `COST` decimal(15,3) DEFAULT NULL,
-  `ADDONITEM` tinyint(1) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=798552 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `povchitem`
---
-
-DROP TABLE IF EXISTS `povchitem`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `povchitem` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `VOUCHNUM` int(11) DEFAULT NULL,
-  `INVENID` int(11) DEFAULT NULL,
-  `RCVQTY` decimal(16,3) DEFAULT NULL,
-  `ORGONHAND` decimal(16,3) DEFAULT NULL,
-  `RCVONHAND` decimal(16,3) DEFAULT NULL,
-  `ORGCOST` decimal(17,4) DEFAULT NULL,
-  `RCVCOST` decimal(17,4) DEFAULT NULL,
-  `RCVLFRGHT` decimal(13,4) DEFAULT NULL,
-  `ORGPRICE` decimal(16,3) DEFAULT NULL,
-  `RCVPRICE` decimal(16,3) DEFAULT NULL,
-  `PRICECHNG` tinyint(1) DEFAULT NULL,
-  `ORGAVGCOST` decimal(21,5) DEFAULT NULL,
-  `RCVAVGCOST` decimal(21,5) DEFAULT NULL,
-  `ORGMARKUP` decimal(11,2) DEFAULT NULL,
-  `RCVMARKUP` decimal(11,2) DEFAULT NULL,
-  `ORGMARGIN` decimal(9,2) DEFAULT NULL,
-  `RCVMARGIN` decimal(9,2) DEFAULT NULL,
-  `CWT` tinyint(1) DEFAULT NULL,
-  `UNITMKUP` decimal(11,2) DEFAULT NULL,
-  `WEIGHT` decimal(13,3) DEFAULT NULL,
-  `ENDRTLVAL` varchar(1) DEFAULT '',
-  `L3DECRTL` tinyint(1) DEFAULT NULL,
-  `LINENUM` bigint(20) DEFAULT NULL,
-  `SGSTPRICE` decimal(16,3) DEFAULT NULL,
-  `ORDERNUM` varchar(14) DEFAULT '',
-  `SERIALNBR` varchar(20) DEFAULT '',
-  `new_item` varchar(255) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `povoucher`
---
-
-DROP TABLE IF EXISTS `povoucher`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `povoucher` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `VENDORID` int(11) DEFAULT NULL,
-  `EMPLOYEE` varchar(255) DEFAULT '',
-  `RCVDATE` date DEFAULT NULL,
-  `RCVTIME` varchar(8) DEFAULT '',
-  `INVDATE` date DEFAULT NULL,
-  `RCVINUM` varchar(15) DEFAULT '',
-  `FREIGHT` decimal(15,2) DEFAULT NULL,
-  `TTLCOST` decimal(15,2) DEFAULT NULL,
-  `VCHTOTAL` decimal(15,2) DEFAULT NULL,
-  `RECEIVED` tinyint(1) DEFAULT NULL,
-  `FRGHTRATE` decimal(15,4) DEFAULT NULL,
-  `FLATRATE` tinyint(1) DEFAULT NULL,
-  `DISTFRGHT` tinyint(1) DEFAULT NULL,
-  `EDITMODE` tinyint(1) DEFAULT NULL,
-  `POID` int(11) DEFAULT NULL,
-  `RCVNOTE` longtext,
-  `EDINOTE` longtext,
-  `EDITOTAL` decimal(15,2) DEFAULT NULL,
-  `EDIVENDOR` varchar(20) DEFAULT '',
-  `store_id` int(10) DEFAULT '0',
-  `user_id` int(10) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `prcchnglog`
---
-
-DROP TABLE IF EXISTS `prcchnglog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `prcchnglog` (
-  `id` bigint(10) unsigned NOT NULL AUTO_INCREMENT,
-  `INVENID` int(11) DEFAULT NULL,
-  `EMP_ID` int(11) DEFAULT NULL,
-  `EMP` varchar(20) DEFAULT '',
-  `AUDIT_DATE` date DEFAULT NULL,
-  `AUDIT_TIME` varchar(8) DEFAULT '',
-  `DATETIME` datetime DEFAULT NULL,
-  `PRCNTCHNG` decimal(2,0) DEFAULT NULL,
-  `PRICE1` decimal(11,3) DEFAULT NULL,
-  `P1PRCNT` decimal(7,2) DEFAULT NULL,
-  `P1MRGN` decimal(5,2) DEFAULT NULL,
-  `ACTUALCOST` decimal(11,4) DEFAULT NULL,
-  `ORGPRICE` decimal(11,3) DEFAULT NULL,
-  `ORGPRCNT` decimal(11,3) DEFAULT NULL,
-  `ORGMRGN` decimal(5,2) DEFAULT NULL,
-  `CATEGORYID` int(11) DEFAULT NULL,
-  `SRCHMETHOD` varchar(20) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `prchorders`
---
-
-DROP TABLE IF EXISTS `prchorders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `prchorders` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `POID` int(11) DEFAULT NULL,
-  `PODATE` date DEFAULT NULL,
-  `POTIME` varchar(8) DEFAULT '',
-  `POEMPLOYEE` varchar(10) DEFAULT '',
-  `POEMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `POVENDORID` int(11) DEFAULT NULL,
-  `POCLOSEDATE` date DEFAULT NULL,
-  `POSTRTDATE` date DEFAULT NULL,
-  `POENDDATE` date DEFAULT NULL,
-  `CLOSEDBY` varchar(10) DEFAULT '',
-  `PODNT` datetime DEFAULT NULL,
-  `VOUCHNUM` int(11) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `PONBR` varchar(200) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11607 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `prospect`
---
-
-DROP TABLE IF EXISTS `prospect`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `prospect` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `PROS_ID` int(11) NOT NULL DEFAULT '0',
-  `PROSITEM` varchar(23) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=363 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `purinapricelist`
---
-
-DROP TABLE IF EXISTS `purinapricelist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `purinapricelist` (
-  `id` bigint(20) unsigned NOT NULL,
-  `LISTNBR` varchar(15) DEFAULT '',
-  `PLANT` varchar(10) DEFAULT '',
-  `EFFECTIVE` date DEFAULT NULL,
-  `EXPIRATION` date DEFAULT NULL,
-  `FREQUENCY` varchar(20) DEFAULT '',
-  `CATEGORY` varchar(40) DEFAULT '',
-  `MATNO` varchar(14) DEFAULT '',
-  `FORMULA` varchar(14) DEFAULT '',
-  `PRODUCT` varchar(40) DEFAULT '',
-  `REF` varchar(10) DEFAULT '',
-  `PRODFORM` varchar(20) DEFAULT '',
-  `SIZE` varchar(20) DEFAULT '',
-  `FOB_DLV` varchar(10) DEFAULT '',
-  `CHANGE` decimal(16,3) DEFAULT NULL,
-  `LISTPRICE` decimal(16,3) DEFAULT NULL,
-  `DISCOUNT` decimal(16,3) DEFAULT NULL,
-  `BULKDISC` decimal(16,3) DEFAULT NULL,
-  `NETPRICE` decimal(16,3) DEFAULT NULL,
-  `COSTCHNG` tinyint(1) DEFAULT NULL,
-  `INVENCASE` bigint(20) DEFAULT NULL,
-  `INVENCOST` decimal(16,3) DEFAULT NULL,
-  `INVENMRKP` decimal(11,2) DEFAULT NULL,
-  `INVENPRICE` decimal(16,3) DEFAULT NULL,
-  `NEWPRICE` decimal(16,3) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `qbilldata`
---
-
-DROP TABLE IF EXISTS `qbilldata`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `qbilldata` (
-  `unique_id` int(11) NOT NULL DEFAULT '0',
-  `BILL_ID` int(11) DEFAULT NULL,
-  `BILL_DATE` date DEFAULT NULL,
-  `DUE_DATE` date DEFAULT NULL,
-  `CUST_ID` int(11) DEFAULT NULL,
-  `PAST_BAL` decimal(11,2) DEFAULT NULL,
-  `TTLDUE` decimal(11,2) DEFAULT NULL,
-  `TRANSDATE` date DEFAULT NULL,
-  `TRANSTIME` varchar(8) DEFAULT '',
-  `ROANBR` int(11) DEFAULT NULL,
-  `ROATOTAL` decimal(11,2) DEFAULT NULL,
-  `INVOICE_NBR` int(11) DEFAULT NULL,
-  `SLS_TOTAL` decimal(11,2) DEFAULT NULL,
-  `SRVCHRG` tinyint(1) DEFAULT NULL,
-  `TTLSLS` decimal(11,2) DEFAULT NULL,
-  `TTLROA` decimal(11,2) DEFAULT NULL,
-  `SPLTCRGBAL` tinyint(1) DEFAULT NULL,
-  `OFPAGE` decimal(3,0) DEFAULT NULL,
-  `ROADATE` date DEFAULT NULL,
-  `ROATIME` varchar(8) DEFAULT '',
-  `roasurcharge` decimal(7,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `quickbooks_accounts`
---
-
-DROP TABLE IF EXISTS `quickbooks_accounts`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `quickbooks_accounts` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `qb_account_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fully_qualified_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `account_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `account_sub_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `current_balance` decimal(15,2) NOT NULL DEFAULT '0.00',
-  `active` tinyint(1) NOT NULL DEFAULT '1',
-  `currency_ref` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `classification` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `sync_token` int(11) NOT NULL DEFAULT '0',
-  `qb_created_at` timestamp NULL DEFAULT NULL,
-  `qb_updated_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `store_id` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `quickbooks_accounts_qb_account_id_index` (`qb_account_id`),
-  KEY `quickbooks_accounts_account_type_index` (`account_type`),
-  KEY `quickbooks_accounts_active_index` (`active`)
-) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `quickbooks_deposits`
---
-
-DROP TABLE IF EXISTS `quickbooks_deposits`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `quickbooks_deposits` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `store_id` bigint(20) unsigned NOT NULL,
-  `deposit_date` date NOT NULL,
-  `qb_deposit_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'QuickBooks Cash Deposit ID',
-  `cash_amount` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'Cash Deposit Amount',
-  `cc_amount` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'Credit Card Deposit Amount',
-  `data` longtext COLLATE utf8mb4_unicode_ci COMMENT 'Serialized income data',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_store_date` (`store_id`,`deposit_date`),
-  KEY `quickbooks_deposits_store_id_index` (`store_id`),
-  KEY `quickbooks_deposits_deposit_date_index` (`deposit_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `quickbooks_tokens`
---
-
-DROP TABLE IF EXISTS `quickbooks_tokens`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `quickbooks_tokens` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `realm_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `access_token` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `refresh_token` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `access_token_expires_at` timestamp NULL DEFAULT NULL,
-  `refresh_token_expires_at` timestamp NULL DEFAULT NULL,
-  `company_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `store_id` int(11) NOT NULL,
-  `payable_account_id` bigint(20) unsigned DEFAULT NULL,
-  `terms` json DEFAULT NULL,
-  `qb_term_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `payment_methods` json DEFAULT NULL,
-  `bank_deposit_account_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `item_account_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cash_payment_method_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `credit_card_payment_method_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `check_payment_method_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `quickbooks_tokens_realm_id_unique` (`realm_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `quickbooks_vendors`
---
-
-DROP TABLE IF EXISTS `quickbooks_vendors`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `quickbooks_vendors` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `qb_vendor_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `display_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `company_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `given_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `family_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `print_on_check_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '1',
-  `balance` decimal(15,2) NOT NULL DEFAULT '0.00',
-  `primary_phone` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `primary_email_addr` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `website` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bill_addr_line1` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bill_addr_line2` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bill_addr_city` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bill_addr_state` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bill_addr_postal_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bill_addr_country` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tax_identifier` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vendor_1099` tinyint(1) NOT NULL DEFAULT '0',
-  `sync_token` int(11) NOT NULL DEFAULT '0',
-  `qb_created_at` timestamp NULL DEFAULT NULL,
-  `qb_updated_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `store_id` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `quickbooks_vendors_qb_vendor_id_index` (`qb_vendor_id`),
-  KEY `quickbooks_vendors_display_name_index` (`display_name`),
-  KEY `quickbooks_vendors_active_index` (`active`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_activity`
---
-
-DROP TABLE IF EXISTS `recurring_activity`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_activity` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `recurring_nbr` int(11) DEFAULT NULL,
-  `cust_id` int(11) DEFAULT NULL,
-  `datetime` datetime DEFAULT NULL,
-  `entity_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `entity_number` int(11) DEFAULT NULL,
-  `action` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `amount` double(8,2) DEFAULT NULL,
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1213 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_invoice_payment`
---
-
-DROP TABLE IF EXISTS `recurring_invoice_payment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_invoice_payment` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `PAYMENTNBR` int(11) NOT NULL,
-  `RECURRINGNBR` int(11) NOT NULL,
-  `INVOICENBR` int(11) NOT NULL,
-  `DATETIME` datetime NOT NULL,
-  `DRAWER_ID` int(11) NOT NULL,
-  `CUST_ID` int(11) NOT NULL,
-  `EMP_ID` int(11) NOT NULL,
-  `AMOUNT` double(8,2) NOT NULL,
-  `TYPE` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `CHECKNBR` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `CC_TYPE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `NOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `XCACCOUNT` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `XCAPPROVAL` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `XCEXPIRE` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `XCTRANSID` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `XCCARDTYPE` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `XCACCNTID` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `XCCARDBAL` double(14,2) DEFAULT NULL,
-  `XCNAME` varchar(35) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_invoice_po`
---
-
-DROP TABLE IF EXISTS `recurring_invoice_po`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_invoice_po` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `PONBR` int(11) NOT NULL,
-  `RECURRING_NBR` int(11) DEFAULT NULL,
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `DUEDATE` datetime DEFAULT NULL,
-  `STATUS` int(11) NOT NULL DEFAULT '0',
-  `IS_PAID` int(11) NOT NULL DEFAULT '0',
-  `CUST_ID` int(11) DEFAULT NULL,
-  `EMP_ID` int(11) DEFAULT NULL,
-  `DRAWER` int(11) DEFAULT NULL,
-  `TAXRATE` double(8,2) DEFAULT NULL,
-  `SUBTOTAL` double(8,2) DEFAULT NULL,
-  `TAXAMNT` double(8,2) DEFAULT NULL,
-  `SLSTOTAL` double(8,2) DEFAULT NULL,
-  `PRICELVL` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `SLSNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `WHR_NOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `COMPUTERID` int(11) DEFAULT NULL,
-  `TRATEDESC` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=531 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_invoice_poitems`
---
-
-DROP TABLE IF EXISTS `recurring_invoice_poitems`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_invoice_poitems` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `PONBR` int(11) NOT NULL,
-  `INVENTORYID` int(11) DEFAULT NULL,
-  `QTY` double(8,2) DEFAULT NULL,
-  `NONTAXABLE` tinyint(1) NOT NULL DEFAULT '0',
-  `SOLDPRICE` double(8,2) DEFAULT NULL,
-  `BOOKEDID` int(11) DEFAULT NULL,
-  `UNIT` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `DISCOUNT` double(8,2) DEFAULT NULL,
-  `COST` double(8,2) DEFAULT NULL,
-  `CWT` tinyint(1) NOT NULL DEFAULT '0',
-  `ORIGPRICE` double(8,2) DEFAULT NULL,
-  `PRICEFROM` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `RECSTATUS` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `PRNTOWHR` tinyint(1) NOT NULL DEFAULT '0',
-  `NONINVITEM` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `DSCAPPROVE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `DSCNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `OVRAPPROVE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `OVRNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `XMPAPPROVE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `XMPNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `EXTENAMNT` double(8,2) DEFAULT NULL,
-  `LINENUM` int(11) DEFAULT NULL,
-  `ORIGNONTAX` tinyint(1) NOT NULL DEFAULT '0',
-  `SERIALNBR` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `VND1ORDNUM` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `RTLPRICE` double(8,2) DEFAULT NULL,
-  `REWARDOK` tinyint(1) NOT NULL DEFAULT '0',
-  `VFDSLSID` int(11) DEFAULT NULL,
-  `VFDMAXQTY` int(11) DEFAULT NULL,
-  `VFDAVLQTY` int(11) DEFAULT NULL,
-  `VFDNUMBER` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `VFDEXPIRE` datetime DEFAULT NULL,
-  `VFDNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `LOYALTYNTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `INACTAPPRV` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `LWQTYAPPRV` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `KITLSTITMS` tinyint(1) NOT NULL DEFAULT '0',
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=526 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_invoice_setup`
---
-
-DROP TABLE IF EXISTS `recurring_invoice_setup`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_invoice_setup` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `RECURRING_NBR` int(11) NOT NULL,
-  `TITLE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `INACTIVE` int(11) NOT NULL DEFAULT '0',
-  `CUST_ID` int(11) DEFAULT NULL,
-  `EMP_ID` int(11) DEFAULT NULL,
-  `DRAWER` int(11) DEFAULT NULL,
-  `TAXRATE` double(8,2) DEFAULT NULL,
-  `SUBTOTAL` double(8,2) DEFAULT NULL,
-  `TAXAMNT` double(8,2) DEFAULT NULL,
-  `SLSTOTAL` double(8,2) DEFAULT NULL,
-  `PRICELVL` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `SLSNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `WHR_NOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `COMPUTERID` int(11) DEFAULT NULL,
-  `REPEAT_TYPE` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `REPEAT_WEEKDAY` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `REPEAT_MONTH` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `REPEAT_DAY` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `SEND_TO` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `CUSTOM_MESSAGE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `PAYMENT_LINK` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `DUEDATE` datetime DEFAULT NULL,
-  `END_OPTION` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ENDDATE` datetime DEFAULT NULL,
-  `END_AFTERINV` int(11) DEFAULT NULL,
-  `END_REASON` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `STARTDATE` datetime DEFAULT NULL,
-  `can_use_cardonfile` tinyint(1) DEFAULT '0',
-  `can_use_charge` tinyint(1) DEFAULT '0',
-  `apprvrecurringby` int(11) DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `due_option` tinyint(1) DEFAULT NULL,
-  `due_custom_day` int(11) DEFAULT NULL,
-  `last_run` date DEFAULT NULL,
-  `TRATEDESC` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_invoiceitems_setup`
---
-
-DROP TABLE IF EXISTS `recurring_invoiceitems_setup`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_invoiceitems_setup` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `RECURRING_NBR` int(11) NOT NULL,
-  `INVENTORYID` int(11) DEFAULT NULL,
-  `QTY` double(8,2) DEFAULT NULL,
-  `NONTAXABLE` tinyint(1) NOT NULL DEFAULT '0',
-  `SOLDPRICE` double(8,2) DEFAULT NULL,
-  `BOOKEDID` int(11) DEFAULT NULL,
-  `UNIT` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `DISCOUNT` double(8,2) DEFAULT NULL,
-  `COST` double(8,2) DEFAULT NULL,
-  `CWT` tinyint(1) NOT NULL DEFAULT '0',
-  `ORIGPRICE` double(8,2) DEFAULT NULL,
-  `PRICEFROM` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `RECSTATUS` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `PRNTOWHR` tinyint(1) NOT NULL DEFAULT '0',
-  `NONINVITEM` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `DSCAPPROVE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `DSCNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `OVRAPPROVE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `OVRNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `XMPAPPROVE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `XMPNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `EXTENAMNT` double(8,2) DEFAULT NULL,
-  `LINENUM` int(11) DEFAULT NULL,
-  `ORIGNONTAX` tinyint(1) NOT NULL DEFAULT '0',
-  `SERIALNBR` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `VND1ORDNUM` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `RTLPRICE` double(8,2) DEFAULT NULL,
-  `REWARDOK` tinyint(1) NOT NULL DEFAULT '0',
-  `VFDSLSID` int(11) DEFAULT NULL,
-  `VFDMAXQTY` int(11) DEFAULT NULL,
-  `VFDAVLQTY` int(11) DEFAULT NULL,
-  `VFDNUMBER` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `VFDEXPIRE` datetime DEFAULT NULL,
-  `VFDNOTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `LOYALTYNTE` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `INACTAPPRV` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `LWQTYAPPRV` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `KITLSTITMS` tinyint(1) NOT NULL DEFAULT '0',
-  `store_id` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `report_view_handler`
---
-
-DROP TABLE IF EXISTS `report_view_handler`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `report_view_handler` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `data` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `store_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -4109,7 +1393,7 @@ DROP TABLE IF EXISTS `rewardcust`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `rewardcust` (
-  `id` bigint(20) unsigned NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `CUSTRWID` int(11) DEFAULT NULL,
   `REWARDID` int(11) DEFAULT NULL,
   `CUST_ID` int(11) DEFAULT NULL,
@@ -4128,7 +1412,12 @@ CREATE TABLE `rewardcust` (
   `store_id` int(11) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `rewardcust_store_id_index` (`store_id`),
+  KEY `rewardcust_custrwid_index` (`CUSTRWID`),
+  KEY `rewardcust_rewardid_index` (`REWARDID`),
+  KEY `rewardcust_cust_id_index` (`CUST_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -4140,7 +1429,7 @@ DROP TABLE IF EXISTS `rewards`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `rewards` (
-  `id` bigint(20) unsigned NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `REWARDID` int(11) DEFAULT NULL,
   `REWARDDESC` varchar(40) DEFAULT '',
   `REWARDTYPE` varchar(10) DEFAULT '',
@@ -4182,7 +1471,10 @@ CREATE TABLE `rewards` (
   `store_id` int(11) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `rewards_store_id_index` (`store_id`),
+  KEY `rewards_rewardid_index` (`REWARDID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -4194,11 +1486,12 @@ DROP TABLE IF EXISTS `role_permissions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `role_permissions` (
-  `id` int(10) NOT NULL,
+  `id` int(10) NOT NULL AUTO_INCREMENT,
   `role_id` int(10) NOT NULL,
   `permission_id` int(10) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -4218,72 +1511,7 @@ CREATE TABLE `roles` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `roles_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `rptsetup`
---
-
-DROP TABLE IF EXISTS `rptsetup`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `rptsetup` (
-  `id` bigint(20) unsigned NOT NULL,
-  `RPT_ID` smallint(6) DEFAULT NULL,
-  `RPT_NAME` varchar(30) DEFAULT '',
-  `RUN_RPT` tinyint(1) DEFAULT NULL,
-  `RPT2PROC` varchar(20) DEFAULT '',
-  `PRAM2` tinyint(1) DEFAULT NULL,
-  `PRAM3` tinyint(1) DEFAULT NULL,
-  `PRAM4` tinyint(1) DEFAULT NULL,
-  `PRAM5` tinyint(1) DEFAULT NULL,
-  `PRAM6` tinyint(1) DEFAULT NULL,
-  `store_id` int(10) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `rptsetup_master`
---
-
-DROP TABLE IF EXISTS `rptsetup_master`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `rptsetup_master` (
-  `RPT_ID` smallint(6) NOT NULL,
-  `RPT_NAME` varchar(30) CHARACTER SET utf8 DEFAULT '',
-  `RUN_RPT` tinyint(1) DEFAULT NULL,
-  `RPT2PROC` varchar(20) CHARACTER SET utf8 DEFAULT '',
-  `PRAM2` bit(1) DEFAULT NULL,
-  `PRAM3` bit(1) DEFAULT NULL,
-  `PRAM4` bit(1) DEFAULT NULL,
-  `PRAM5` bit(1) DEFAULT NULL,
-  `PRAM6` bit(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `rpttime`
---
-
-DROP TABLE IF EXISTS `rpttime`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `rpttime` (
-  `id` bigint(20) unsigned NOT NULL,
-  `STARTRPT` datetime DEFAULT NULL,
-  `ENDRPT` datetime DEFAULT NULL,
-  `STARTSEC` decimal(27,5) DEFAULT NULL,
-  `ENDSEC` decimal(27,5) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4401,14 +1629,7 @@ CREATE TABLE `security` (
   `ADDPYBLS` tinyint(1) DEFAULT '0',
   `CATDISCMNG` tinyint(1) DEFAULT '0',
   `alwrecurring` tinyint(1) DEFAULT '0',
-  `alwitemonrecurring` tinyint(1) DEFAULT NULL,
-  `alwrecurringsales` tinyint(1) DEFAULT '0',
-  `alwrecurracptpayments` tinyint(1) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `ALWNEGQ_P` tinyint(1) DEFAULT '0',
-  `usehandheld` varchar(45) DEFAULT '0',
+  `usehandheld` tinyint(1) DEFAULT '0',
   `invmodintg` tinyint(1) DEFAULT NULL,
   `intgmenu` tinyint(4) NOT NULL DEFAULT '0',
   `intgshopify` tinyint(4) NOT NULL DEFAULT '0',
@@ -4416,9 +1637,18 @@ CREATE TABLE `security` (
   `intgquickbooks` tinyint(4) NOT NULL DEFAULT '0',
   `intgnewmediaretailer` tinyint(4) NOT NULL DEFAULT '0',
   `intgpriceboard` tinyint(4) NOT NULL DEFAULT '0',
+  `alwitemonrecurring` tinyint(1) DEFAULT NULL,
+  `alwrecurringsales` tinyint(1) DEFAULT '0',
+  `alwrecurracptpayments` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `ALWNEGQ_P` tinyint(1) DEFAULT '0',
   `alwpricechngeprcnt` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=739 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `security_store_id_index` (`store_id`),
+  KEY `security_securityid_index` (`SECURITYID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1539 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4436,8 +1666,9 @@ CREATE TABLE `sequences` (
   `sequence` bigint(20) unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`id`),
+  KEY `sequences_store_id_table_name_column_name_index` (`store_id`,`table_name`,`column_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4464,10 +1695,10 @@ CREATE TABLE `serialnbrs` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `serialnbrscol` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `serialnbrscol_UNIQUE` (`serialnbrscol`,`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
+  KEY `serialnbrs_store_id_index` (`store_id`),
+  KEY `serialnbrs_invenid_index` (`INVENID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -4484,559 +1715,9 @@ CREATE TABLE `sessions` (
   `user_agent` text COLLATE utf8mb4_unicode_ci,
   `payload` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_activity` int(11) NOT NULL,
-  `store_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `shopify_collections`
---
-
-DROP TABLE IF EXISTS `shopify_collections`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `shopify_collections` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `collection_id` bigint(20) unsigned NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `store_id` int(11) NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1=active, 0=inactive',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `shopify_collections_collection_id_store_id_unique` (`collection_id`,`store_id`),
-  KEY `shopify_collections_store_id_status_index` (`store_id`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=280 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `shopify_mapping`
---
-
-DROP TABLE IF EXISTS `shopify_mapping`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `shopify_mapping` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `variant_product_id` bigint(20) unsigned DEFAULT NULL,
-  `shopify_id` bigint(20) unsigned DEFAULT NULL,
-  `shopify_variant_id` bigint(20) unsigned DEFAULT NULL,
-  `INVENID` bigint(20) unsigned DEFAULT NULL,
   `store_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `shopify_shipping_profiles`
---
-
-DROP TABLE IF EXISTS `shopify_shipping_profiles`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `shopify_shipping_profiles` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `profile_id` bigint(20) unsigned NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `store_id` int(11) NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1=active, 0=inactive',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `shopify_shipping_profiles_profile_id_unique` (`profile_id`),
-  KEY `shopify_shipping_profiles_store_id_status_index` (`store_id`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig`
---
-
-DROP TABLE IF EXISTS `sig`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  KEY `sig_invoicenbr_index` (`INVOICENBR`)
+  UNIQUE KEY `sessions_id_unique` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2017q1`
---
-
-DROP TABLE IF EXISTS `sig2017q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2017q1` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2017q2`
---
-
-DROP TABLE IF EXISTS `sig2017q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2017q2` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2017q3`
---
-
-DROP TABLE IF EXISTS `sig2017q3`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2017q3` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2017q4`
---
-
-DROP TABLE IF EXISTS `sig2017q4`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2017q4` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2018q1`
---
-
-DROP TABLE IF EXISTS `sig2018q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2018q1` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2018q2`
---
-
-DROP TABLE IF EXISTS `sig2018q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2018q2` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2018q3`
---
-
-DROP TABLE IF EXISTS `sig2018q3`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2018q3` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2018q4`
---
-
-DROP TABLE IF EXISTS `sig2018q4`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2018q4` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2019q1`
---
-
-DROP TABLE IF EXISTS `sig2019q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2019q1` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2019q2`
---
-
-DROP TABLE IF EXISTS `sig2019q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2019q2` (
-  `INVOICENBR` int(11) DEFAULT NULL,
-  `XCSIGIMAGE` longtext,
-  `CHRGSIG` longtext,
-  `XMPTSIG` longtext,
-  `JDFSIG` longtext,
-  `CC2SIGIMG` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2022q1`
---
-
-DROP TABLE IF EXISTS `sig2022q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2022q1` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2022q1_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2022q2`
---
-
-DROP TABLE IF EXISTS `sig2022q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2022q2` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2022q2_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2022q3`
---
-
-DROP TABLE IF EXISTS `sig2022q3`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2022q3` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2022q3_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2022q4`
---
-
-DROP TABLE IF EXISTS `sig2022q4`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2022q4` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2022q4_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2023q1`
---
-
-DROP TABLE IF EXISTS `sig2023q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2023q1` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2023q1_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2023q2`
---
-
-DROP TABLE IF EXISTS `sig2023q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2023q2` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2023q2_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2023q3`
---
-
-DROP TABLE IF EXISTS `sig2023q3`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2023q3` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2023q3_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2024q1`
---
-
-DROP TABLE IF EXISTS `sig2024q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2024q1` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2024q1_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2024q2`
---
-
-DROP TABLE IF EXISTS `sig2024q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2024q2` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2024q2_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2024q3`
---
-
-DROP TABLE IF EXISTS `sig2024q3`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2024q3` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2024q3_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2024q4`
---
-
-DROP TABLE IF EXISTS `sig2024q4`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2024q4` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2024q4_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2025q1`
---
-
-DROP TABLE IF EXISTS `sig2025q1`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2025q1` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2025q1_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `sig2025q2`
---
-
-DROP TABLE IF EXISTS `sig2025q2`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sig2025q2` (
-  `INVOICENBR` int(11) NOT NULL,
-  `XCSIGIMAGE` longtext COLLATE utf8mb4_unicode_ci,
-  `CHRGSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `XMPTSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `JDFSIG` longtext COLLATE utf8mb4_unicode_ci,
-  `CC2SIGIMG` longtext COLLATE utf8mb4_unicode_ci,
-  `store_id` int(11) NOT NULL,
-  KEY `sig2025q2_invoicenbr_index` (`INVOICENBR`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `slideshow`
---
-
-DROP TABLE IF EXISTS `slideshow`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `slideshow` (
-  `id` bigint(20) unsigned NOT NULL,
-  `SLIDERANK` int(11) DEFAULT NULL,
-  `SLIDENAME` varchar(10) DEFAULT '',
-  `SLIDEPIC` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `startingbal`
---
-
-DROP TABLE IF EXISTS `startingbal`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `startingbal` (
-  `id` bigint(20) unsigned NOT NULL,
-  `STRTBALID` int(11) DEFAULT NULL,
-  `SBDATE` date DEFAULT NULL,
-  `SBTIME` varchar(8) DEFAULT '',
-  `sbdatetime` datetime DEFAULT NULL,
-  `SBEMPLOYEE` varchar(200) DEFAULT '',
-  `SBEMPLOYEE_ID` int(11) NOT NULL DEFAULT '0',
-  `SBAMOUNT` decimal(13,2) DEFAULT NULL,
-  `SBDRAWER` varchar(2) DEFAULT '',
-  `SBNOTE` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5047,10 +1728,12 @@ DROP TABLE IF EXISTS `states`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `states` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `country_id` int(11) NOT NULL
+  `country_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `states_id_index` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -5084,6 +1767,8 @@ CREATE TABLE `stations` (
   `Prompt4SecCopy` tinyint(1) DEFAULT NULL,
   `WhrPrnName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `UseWhrPrn` tinyint(1) DEFAULT NULL,
+  `LastPrn` char(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `LastlblType` char(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `UseCashDrawer` tinyint(1) DEFAULT NULL,
   `CashDrawerPort` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `OpenCash` tinyint(1) DEFAULT NULL,
@@ -5114,8 +1799,9 @@ CREATE TABLE `stations` (
   `lastShowBatchMsg` datetime DEFAULT NULL,
   `dcap_device_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `xcWthoutMchn` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`id`),
+  KEY `stations_id_index` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5155,8 +1841,6 @@ CREATE TABLE `stores` (
   `CostCode` varchar(255) DEFAULT NULL,
   `LayoutTopLeft` varchar(255) DEFAULT NULL,
   `LayoutTopRight` varchar(255) DEFAULT NULL,
-  `LastPrn` varchar(255) DEFAULT NULL,
-  `LastlblType` varchar(255) DEFAULT NULL,
   `migrated_at` timestamp NULL DEFAULT NULL,
   `dcsurchrg` tinyint(1) NOT NULL DEFAULT '0',
   `dcsurchrgprcnt` decimal(15,2) DEFAULT '0.00',
@@ -5174,14 +1858,14 @@ CREATE TABLE `stores` (
   `offline_mode` tinyint(1) NOT NULL DEFAULT '0',
   `offline_token` varchar(32) DEFAULT NULL,
   `media_retailer` tinyint(1) DEFAULT '0',
-  `shopify_apikey` varchar(255) DEFAULT NULL,
+  `migration_detail` json DEFAULT NULL,
   `allowimportinv` tinyint(1) DEFAULT '0',
   `allowlinetax` tinyint(1) NOT NULL DEFAULT '0',
   `tax_update_status` tinyint(1) NOT NULL DEFAULT '0',
   `db_connection_info` text COMMENT 'Encrypted JSON: {host, port, database, username, password}',
   `alwlocally` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5192,7 +1876,7 @@ DROP TABLE IF EXISTS `systemsettings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `systemsettings` (
-  `id` bigint(20) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `BILLMESS1` varchar(70) DEFAULT '',
   `BILLMESS2` varchar(70) DEFAULT '',
   `BILLMESS3` varchar(70) DEFAULT '',
@@ -5371,216 +2055,9 @@ CREATE TABLE `systemsettings` (
   `locally_ftp_details` varchar(255) DEFAULT NULL,
   `locally_notification_email` varchar(100) DEFAULT NULL,
   `locally_last_delta_run` timestamp NULL DEFAULT NULL,
-  `ORGLAUTORC` int(11) DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `t_cl_his`
---
-
-DROP TABLE IF EXISTS `t_cl_his`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_cl_his` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `T_CLOCK_HIS_ID` int(11) NOT NULL DEFAULT '0',
-  `TE_NOTE` longtext,
-  `TCNAME` varchar(200) DEFAULT '',
-  `TCNAME_ID` int(10) NOT NULL,
-  `TCDATE` date DEFAULT NULL,
-  `TCDATETIME` datetime DEFAULT NULL,
-  `TCMEMO` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
+  `ORGLAUTORC` int(11) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3094 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `t_clock`
---
-
-DROP TABLE IF EXISTS `t_clock`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `t_clock` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `T_CLOCK_ID` int(11) DEFAULT NULL,
-  `T_IN_OUT` varchar(3) DEFAULT '',
-  `T_NAME_ID` int(10) NOT NULL,
-  `T_NAME` varchar(255) DEFAULT '',
-  `T_DATE` date DEFAULT NULL,
-  `T_TIME` varchar(8) DEFAULT '',
-  `T_DATE_TIME` datetime DEFAULT NULL,
-  `T_DURATION` int(25) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=295 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `tableindex`
---
-
-DROP TABLE IF EXISTS `tableindex`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tableindex` (
-  `TABLEID` int(11) DEFAULT NULL,
-  `SEQUENCE` tinyint(4) DEFAULT NULL,
-  `TAGNAME` varchar(10) DEFAULT '',
-  `KEY` varchar(50) DEFAULT '',
-  `FILTER` varchar(50) DEFAULT '',
-  `UNIQUE` bit(1) DEFAULT NULL,
-  `DESCENDING` bit(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `tablelist`
---
-
-DROP TABLE IF EXISTS `tablelist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tablelist` (
-  `TABLEID` int(11) DEFAULT NULL,
-  `TBLNAME` varchar(50) DEFAULT '',
-  `TBLDESC` varchar(50) DEFAULT '',
-  `DBMAINT` date DEFAULT NULL,
-  `CLEANUP` bit(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `tablestructure`
---
-
-DROP TABLE IF EXISTS `tablestructure`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tablestructure` (
-  `CRSSTRID` bigint(20) DEFAULT NULL,
-  `FIELD_NAME` varchar(10) DEFAULT '',
-  `FIELD_TYPE` varchar(1) DEFAULT '',
-  `FIELD_LEN` smallint(6) DEFAULT NULL,
-  `FIELD_DEC` smallint(6) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `tax_rates`
---
-
-DROP TABLE IF EXISTS `tax_rates`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tax_rates` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `desc` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `percent` decimal(6,3) NOT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `trans2list`
---
-
-DROP TABLE IF EXISTS `trans2list`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `trans2list` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `TRANS2ID` int(11) DEFAULT NULL,
-  `TRANSTO` varchar(20) DEFAULT '',
-  `INACTIVE` tinyint(1) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `transfers`
---
-
-DROP TABLE IF EXISTS `transfers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `transfers` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `TRANSID` int(11) DEFAULT NULL,
-  `TRANS2ID` int(11) DEFAULT NULL,
-  `EMPLOYEE` varchar(10) DEFAULT '',
-  `TRANSDNT` datetime DEFAULT NULL,
-  `TRANSTOTAL` decimal(16,3) DEFAULT NULL,
-  `TRANSFERED` tinyint(1) DEFAULT NULL,
-  `TRANSIN` bit(1) DEFAULT NULL,
-  `TRNSNOTE` longtext,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `transitems`
---
-
-DROP TABLE IF EXISTS `transitems`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `transitems` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `TRANSID` int(11) DEFAULT NULL,
-  `INVENID` int(11) DEFAULT NULL,
-  `TRANSQTY` decimal(16,3) DEFAULT NULL,
-  `ORGONHAND` decimal(16,3) DEFAULT NULL,
-  `TRNSONHAND` decimal(16,3) DEFAULT NULL,
-  `ORGCOST` decimal(17,4) DEFAULT NULL,
-  `ORGPRICE` decimal(16,3) DEFAULT NULL,
-  `ORGAVGCOST` decimal(21,5) DEFAULT NULL,
-  `CWT` tinyint(1) DEFAULT NULL,
-  `WEIGHT` decimal(13,3) DEFAULT NULL,
-  `TRNSLNNBR` bigint(20) DEFAULT NULL,
-  `ORDERNUM` varchar(14) DEFAULT '',
-  `SERIALNBR` varchar(20) DEFAULT '',
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `updatelist`
---
-
-DROP TABLE IF EXISTS `updatelist`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `updatelist` (
-  `UPDTPROC` varchar(15) DEFAULT '',
-  `UPDTDESC` varchar(40) DEFAULT '',
-  `STEPS` tinyint(4) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5615,159 +2092,10 @@ CREATE TABLE `users` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   `wagesbyhr` int(11) DEFAULT '0',
   `store_admin` tinyint(1) DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3997 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `variant_type_options`
---
-
-DROP TABLE IF EXISTS `variant_type_options`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `variant_type_options` (
-  `vto_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `vt_id` int(10) unsigned NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `active` tinyint(4) NOT NULL DEFAULT '1',
-  `store_id` int(10) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`vto_id`),
-  KEY `variant_type_options_vt_id_foreign` (`vt_id`),
-  KEY `variant_type_options_store_id_index` (`store_id`),
-  CONSTRAINT `variant_type_options_vt_id_foreign` FOREIGN KEY (`vt_id`) REFERENCES `variant_types` (`vt_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `variant_types`
---
-
-DROP TABLE IF EXISTS `variant_types`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `variant_types` (
-  `vt_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `active` tinyint(4) NOT NULL DEFAULT '1',
-  `store_id` int(10) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`vt_id`),
-  KEY `variant_types_store_id_index` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `variants_product`
---
-
-DROP TABLE IF EXISTS `variants_product`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `variants_product` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `vpid` int(10) unsigned NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `variant_types` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `inactive` tinyint(4) NOT NULL DEFAULT '1',
-  `categoryid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lup_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vendor1id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `nontaxable` tinyint(4) NOT NULL DEFAULT '1',
-  `item_artg` tinyint(4) NOT NULL DEFAULT '0',
-  `item_media_retail` tinyint(4) NOT NULL DEFAULT '0',
-  `item_locally` tinyint(4) NOT NULL DEFAULT '0',
-  `item_shopify` tinyint(4) NOT NULL DEFAULT '0',
-  `store_id` int(10) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `tobesync_shopify` int(2) DEFAULT '0',
-  `shopify_category` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `image_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `variants_product_store_id_index` (`store_id`),
-  KEY `vp_store_sync_shopify_index` (`store_id`,`tobesync_shopify`,`item_shopify`),
-  KEY `variants_product_vpid_index` (`vpid`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `variants_product_item`
---
-
-DROP TABLE IF EXISTS `variants_product_item`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `variants_product_item` (
-  `vpi_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `vpid` int(10) unsigned NOT NULL,
-  `vtoid1` int(10) unsigned DEFAULT NULL,
-  `vtoid2` int(10) unsigned DEFAULT NULL,
-  `invenid` int(10) unsigned DEFAULT NULL,
-  `store_id` int(10) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`vpi_id`),
-  KEY `variants_product_item_store_id_index` (`store_id`),
-  KEY `vpi_vpid_store_id_index` (`vpid`,`store_id`),
-  KEY `vpi_invenid_index` (`invenid`),
-  CONSTRAINT `variants_product_item_vpid_foreign` FOREIGN KEY (`vpid`) REFERENCES `variants_product` (`vpid`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `vchitem`
---
-
-DROP TABLE IF EXISTS `vchitem`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `vchitem` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `VOUCHNUM` int(11) DEFAULT NULL,
-  `INVENID` int(11) DEFAULT NULL,
-  `RCVQTY` decimal(11,3) DEFAULT NULL,
-  `ORGONHAND` decimal(11,3) DEFAULT NULL,
-  `RCVONHAND` decimal(11,3) DEFAULT NULL,
-  `ORGCOST` decimal(11,4) DEFAULT NULL,
-  `RCVCOST` decimal(11,4) DEFAULT NULL,
-  `RCVLFRGHT` decimal(17,4) DEFAULT NULL,
-  `ORGPRICE` decimal(11,3) DEFAULT NULL,
-  `RCVPRICE` decimal(11,3) DEFAULT NULL,
-  `PRICECHNG` tinyint(1) DEFAULT NULL,
-  `ORGAVGCOST` decimal(14,5) DEFAULT NULL,
-  `RCVAVGCOST` decimal(14,5) DEFAULT NULL,
-  `ORGMARKUP` decimal(7,2) DEFAULT NULL,
-  `RCVMARKUP` decimal(7,2) DEFAULT NULL,
-  `ORGMARGIN` decimal(5,2) DEFAULT NULL,
-  `RCVMARGIN` decimal(5,2) DEFAULT NULL,
-  `CWT` tinyint(1) DEFAULT NULL,
-  `UNITMKUP` decimal(7,2) DEFAULT NULL,
-  `WEIGHT` decimal(8,3) DEFAULT NULL,
-  `ENDRTLVAL` varchar(1) DEFAULT '',
-  `L3DECRTL` tinyint(1) DEFAULT NULL,
-  `LINENUM` decimal(10,0) DEFAULT NULL,
-  `SGSTPRICE` decimal(11,3) DEFAULT NULL,
-  `ORDERNUM` varchar(200) DEFAULT NULL,
-  `SERIALNBR` varchar(20) DEFAULT '',
-  `CASEQTY` int(11) DEFAULT NULL,
-  `CASECHANGE` tinyint(1) DEFAULT NULL,
-  `new_item` varchar(255) DEFAULT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
-  `PHOTO1FN` char(255) DEFAULT NULL,
-  `PHOTO2FN` char(255) DEFAULT NULL,
-  `PHOTO3FN` char(255) DEFAULT NULL,
-  `IHTAXRATE` varchar(255) DEFAULT NULL,
-  `IHNONTAXABLE` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=426893 DEFAULT CHARSET=utf8;
+  KEY `users_store_id_index` (`store_id`),
+  KEY `users_company_id_index` (`company_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1628 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5814,50 +2142,11 @@ CREATE TABLE `vendors` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6116 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `voucher`
---
-
-DROP TABLE IF EXISTS `voucher`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `voucher` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `VOUCHNUM` int(11) NOT NULL DEFAULT '0',
-  `VENDORID` int(11) DEFAULT NULL,
-  `EMPLOYEE` varchar(255) DEFAULT '',
-  `RCVDATE` date DEFAULT NULL,
-  `RCVTIME` varchar(8) DEFAULT '',
-  `rcvdatetime` datetime DEFAULT NULL,
-  `INVDATE` date DEFAULT NULL,
-  `RCVINUM` varchar(15) DEFAULT '',
-  `FREIGHT` decimal(11,2) DEFAULT NULL,
-  `TTLCOST` decimal(11,2) DEFAULT NULL,
-  `VCHTOTAL` decimal(11,2) DEFAULT NULL,
-  `RECEIVED` tinyint(1) DEFAULT NULL,
-  `FRGHTRATE` decimal(9,4) DEFAULT NULL,
-  `FLATRATE` tinyint(1) DEFAULT NULL,
-  `DISTFRGHT` tinyint(1) DEFAULT NULL,
-  `EDITMODE` tinyint(1) DEFAULT NULL,
-  `POID` int(11) DEFAULT NULL,
-  `RCVNOTE` longtext,
-  `EDINOTE` longtext,
-  `EDITOTAL` decimal(11,2) DEFAULT NULL,
-  `EDIVENDOR` varchar(20) DEFAULT '',
-  `store_id` int(10) DEFAULT '0',
-  `user_id` int(10) DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `deleted_at` timestamp NULL DEFAULT NULL,
-  `PONBR` varchar(100) DEFAULT NULL,
-  `received_from` varchar(100) DEFAULT NULL,
-  `ocr_file` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35652 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`,`VENDOR`,`VCUST_NO`,`CONTACT`),
+  KEY `vendors_store_id_index` (`store_id`),
+  KEY `vendors_vendorid_index` (`VENDORID`)
+) ENGINE=InnoDB AUTO_INCREMENT=10850 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -5880,8 +2169,9 @@ CREATE TABLE `whrticket` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=656 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `whrticket_store_id_index` (`store_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -5893,4 +2183,4 @@ CREATE TABLE `whrticket` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-12 10:14:59
+-- Dump completed on 2026-05-25 10:32:48

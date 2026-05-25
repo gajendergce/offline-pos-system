@@ -179,6 +179,7 @@ chmod -R ug+rwX storage bootstrap/cache
 chmod -R 777 storage
 
 php artisan optimize:clear
+php artisan migrate --path=database/offline_migrations --force --no-interaction || true
 '; then
     maintenance_ok=1
     echo "Post-setup Laravel maintenance completed."

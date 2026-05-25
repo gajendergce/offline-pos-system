@@ -199,6 +199,17 @@ chmod -R 777 storage /var/www/html/pos/storage
 
 composer install --no-interaction --prefer-dist --optimize-autoloader
 
+# Replace any amd64 wkhtmltopdf vendor binary with the native system binary.
+# Packages like h4cc/wkhtmltopdf-amd64 bundle an x86_64 ELF which crashes on arm64.
+WKHTML_SYS="$(command -v wkhtmltopdf 2>/dev/null || true)"
+if [ -n "$WKHTML_SYS" ]; then
+  find vendor -type f -name 'wkhtmltopdf*' ! -name '*.php' ! -name '*.json' 2>/dev/null | while read -r bin; do
+    cp "$WKHTML_SYS" "$bin"
+    chmod +x "$bin"
+    echo "Replaced vendor wkhtmltopdf binary: $bin"
+  done
+fi
+
 attempt=1
 max_attempts=20
 case "$DB_SETUP_MODE" in
