@@ -40,7 +40,14 @@ REM Resolve ZIP URL: replace APP_VERSION placeholder via API
 if not defined APP_ZIP_URL set "APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip"
 
 echo Fetching latest app version from API...
-for /f "delims=" %%V in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "try { $r = Invoke-RestMethod -Uri '%APP_VERSION_URL%' -Method Get -ContentType 'application/json' -Body ('{\"store_id\":%OFFLINE_STORE_ID%,\"offline_token\":\"%OFFLINE_TOKEN%\"}') -ErrorAction Stop; if ($r.POS_OFFLINE_BUNDLE_APP_VERSION) { $r.POS_OFFLINE_BUNDLE_APP_VERSION } elseif ($r.version) { $r.version } else { $r } } catch { Write-Error $_.Exception.Message; exit 1 }"') do set "RESOLVED_VERSION=%%V"
+set "_VER_TMP=%TEMP%\pos_ver_%RANDOM%.json"
+curl.exe -s --location --request GET "%APP_VERSION_URL%" --header "Content-Type: application/json" --data "{\"store_id\":%OFFLINE_STORE_ID%,\"offline_token\":\"%OFFLINE_TOKEN%\"}" --output "%_VER_TMP%" 2>nul
+if not exist "%_VER_TMP%" (
+  echo Error: API request failed. Ensure curl.exe is available ^(Windows 10 1803+^) and network is reachable.
+  goto :end
+)
+for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "(Get-Content -LiteralPath '%_VER_TMP%' -Raw | ConvertFrom-Json).POS_OFFLINE_BUNDLE_APP_VERSION"`) do set "RESOLVED_VERSION=%%V"
+del "%_VER_TMP%" >nul 2>&1
 
 if not defined RESOLVED_VERSION (
   echo Error: could not resolve app version from API.
