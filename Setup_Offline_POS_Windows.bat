@@ -1,16 +1,10 @@
 @echo off
-setlocal enableextensions
+setlocal enableextensions enabledelayedexpansion
 
 set "PROJECT_DIR=%~dp0"
-set "DEFAULT_ZIP_URL=http://taxnomist.busywizzy.com/pos_1.0.zip"
-set "DEFAULT_VERSION_URL="
-set "DEFAULT_TARGET_VERSION="
 set "COMPOSE_FILE=%PROJECT_DIR%docker-compose.github.yml"
 
-set "APP_ZIP_URL=%DEFAULT_ZIP_URL%"
 set "APP_SYNC_ZIP_ON_START=1"
-if not defined APP_VERSION_URL set "APP_VERSION_URL=%DEFAULT_VERSION_URL%"
-if not defined APP_TARGET_VERSION set "APP_TARGET_VERSION=%DEFAULT_TARGET_VERSION%"
 set "DB_DATABASE=agrtl_offline"
 set "DB_PASSWORD=root123"
 set "DB_APP_USER=app"
@@ -33,6 +27,32 @@ echo Starting full offline setup...
 echo Project root: %PROJECT_DIR%
 echo Compose file: %COMPOSE_FILE%
 
+REM Load .env.offline values if present
+set "OFFLINE_ENV=%PROJECT_DIR%.env.offline"
+if exist "%OFFLINE_ENV%" (
+  for /f "usebackq tokens=1,* delims==" %%A in ("%OFFLINE_ENV%") do (
+    set "line=%%A"
+    if not "!line:~0,1!"=="#" if not "%%A"=="" set "%%A=%%B"
+  )
+)
+
+REM Resolve ZIP URL: replace APP_VERSION placeholder via API
+if not defined APP_ZIP_URL set "APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip"
+
+echo Fetching latest app version from API...
+for /f "delims=" %%V in ('powershell -NoProfile -ExecutionPolicy Bypass -Command "try { $r = Invoke-RestMethod -Uri '%APP_VERSION_URL%' -Method Get -ContentType 'application/json' -Body ('{\"store_id\":%OFFLINE_STORE_ID%,\"offline_token\":\"%OFFLINE_TOKEN%\"}') -ErrorAction Stop; if ($r.POS_OFFLINE_BUNDLE_APP_VERSION) { $r.POS_OFFLINE_BUNDLE_APP_VERSION } elseif ($r.version) { $r.version } else { $r } } catch { Write-Error $_.Exception.Message; exit 1 }"') do set "RESOLVED_VERSION=%%V"
+
+if not defined RESOLVED_VERSION (
+  echo Error: could not resolve app version from API.
+  echo Check APP_VERSION_URL, OFFLINE_STORE_ID and OFFLINE_TOKEN in .env.offline.
+  goto :end
+)
+
+echo Resolved version: %RESOLVED_VERSION%
+set "APP_ZIP_URL=%APP_ZIP_URL:APP_VERSION=%RESOLVED_VERSION%%"
+
+echo Using ZIP URL: %APP_ZIP_URL%
+
 docker compose -f "%COMPOSE_FILE%" up -d --build
 if errorlevel 1 (
   echo.
@@ -49,9 +69,6 @@ if errorlevel 1 (
 )
 
 echo Setup complete. App is reachable at http://localhost:8080/login
-echo Tip: ZIP sync runs once on first startup and skips on restart.
-echo Tip: if APP_VERSION_URL is configured, ZIP sync happens only when API version changes.
-echo To force sync every start, set APP_SYNC_ZIP_ON_START=always before compose up.
 
 :end
 echo.

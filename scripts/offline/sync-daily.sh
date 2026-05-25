@@ -31,45 +31,55 @@ if [[ -z "$OFFLINE_API_BASE_URL" && -n "$APP_VERSION_URL" ]]; then
 fi
 
 sync_offline_env_into_app_env() {
-  local zip_value="$1"
+  local resolved_zip_url="${1:-}"
 
+  # Collect all non-comment, non-empty lines from .env.offline
+  local env_lines
+  env_lines="$(grep -v '^\s*#' "$OFFLINE_ENV_FILE" | grep -v '^\s*$' || true)"
+  if [[ -z "$env_lines" ]]; then
+    return 0
+  fi
+
+  # Pipe every key=value from .env.offline into the container and apply via set_kv
+  printf '%s\n' "$env_lines" | \
   docker compose -f "$COMPOSE_FILE" exec -T app sh -lc '
 cd /var/www/html
 
-store_id="$1"
-token="$2"
-base_url="$3"
-version_url="$4"
-zip_url="$5"
-
 if [ ! -f .env ]; then
-  exit 0
+  [ -f .env.example ] && cp .env.example .env || exit 0
 fi
 
 set_kv() {
   key="$1"
   val="$2"
-  if [ -z "$val" ]; then
-    return 0
-  fi
-
-  if grep -q "^${key}=" .env; then
-    sed -i "s|^${key}=.*|${key}=${val}|" .env
-  else
-    echo "${key}=${val}" >> .env
-  fi
+  [ -z "$key" ] && return 0
+  tmpfile="$(mktemp)"
+  grep -v "^${key}=" .env > "$tmpfile" || true
+  printf "%s=%s\n" "$key" "$val" >> "$tmpfile"
+  mv "$tmpfile" .env
 }
 
-set_kv POS_OFFLINE_MODE true
-set_kv OFFLINE_STORE_ID "$store_id"
-set_kv OFFLINE_TOKEN "$token"
-set_kv OFFLINE_API_BASE_URL "$base_url"
-set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
-set_kv POS_OFFLINE_SYNC_TOKEN "$token"
-set_kv POS_OFFLINE_SYNC_SOURCE_URL "$base_url"
-set_kv APP_VERSION_URL "$version_url"
-set_kv APP_ZIP_URL "$zip_url"
-' sh "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN" "$OFFLINE_API_BASE_URL" "$APP_VERSION_URL" "$zip_value"
+while IFS= read -r line; do
+  case "$line" in ""|\#*) continue ;; esac
+  key="${line%%=*}"
+  val="${line#*=}"
+  set_kv "$key" "$val"
+done
+
+php artisan config:clear >/dev/null 2>&1 || true
+'
+
+  # Override APP_ZIP_URL with the resolved version (not the placeholder template)
+  if [[ -n "$resolved_zip_url" ]]; then
+    docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
+cd /var/www/html
+tmpfile=\"\$(mktemp)\"
+grep -v '^APP_ZIP_URL=' .env > \"\$tmpfile\" || true
+printf 'APP_ZIP_URL=%s\n' '$resolved_zip_url' >> \"\$tmpfile\"
+mv \"\$tmpfile\" .env
+php artisan config:clear >/dev/null 2>&1 || true
+"
+  fi
 }
 
 ensure_scheduler_sync_keys() {
@@ -165,8 +175,8 @@ old_version="$(docker compose -f "$COMPOSE_FILE" exec -T app sh -lc 'cat /var/ww
 old_version="$(printf "%s" "$old_version" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
 echo "Old version from local marker: ${old_version:-none}"
 
-if [[ -n "$old_version" && "$old_version" == "$new_version" ]]; then
-  echo "Version matches. No code pull needed."
+if [[ "$old_version" == "$new_version" ]]; then
+  echo "Version matches ($new_version). No code pull needed."
   echo "Syncing .env.offline values into app .env..."
   sync_offline_env_into_app_env "$APP_ZIP_URL"
   ensure_scheduler_sync_keys
@@ -224,6 +234,7 @@ chmod -R ug+rwX storage bootstrap/cache
 chmod -R 777 storage
 
 php artisan optimize:clear
+php artisan migrate --path=database/offline_migrations --force --no-interaction || true
 APP_MAINTENANCE
     maintenance_ok=1
     echo "Post-sync Laravel maintenance completed."
