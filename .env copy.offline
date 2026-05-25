@@ -1,7 +1,7 @@
 # OFFLINE_STORE_ID=39
 # OFFLINE_TOKEN=7QHP5aPCuae5cy2xFQlAvMrjR0NoQqlS
 
-OFFLINE_STORE_ID=84 
+OFFLINE_STORE_ID=84
 OFFLINE_TOKEN=bxJoJyRpg6HhnP7ZnsNMp64R6tYV2k75
 # API endpoint returning bundle version
 # APP_VERSION_URL=https://agretail.ddev.site/api/offline/version
