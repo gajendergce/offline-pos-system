@@ -152,6 +152,9 @@ fi
 if [ ! -f .env ] && [ -f .env.example ]; then
   cp .env.example .env
 fi
+# Strip Windows CRLF from .env — a trailing \r on APP_KEY makes Laravel
+# treat the key as invalid even though it looks correct.
+sed -i 's/\r$//' .env 2>/dev/null || true
 
 # Local docker runs plain HTTP on :8080; prevent app-level forced HTTPS redirects.
 if [ -f app/Providers/AppServiceProvider.php ]; then

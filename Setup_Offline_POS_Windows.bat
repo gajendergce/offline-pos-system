@@ -27,12 +27,15 @@ echo Starting full offline setup...
 echo Project root: %PROJECT_DIR%
 echo Compose file: %COMPOSE_FILE%
 
-REM Load .env.offline values if present
+REM Load .env.offline values if present.
+REM Use PowerShell to read the file so CRLF line endings are stripped
+REM automatically -- a trailing \r on any value corrupts API calls and URLs.
 set "OFFLINE_ENV=%PROJECT_DIR%.env.offline"
 if exist "%OFFLINE_ENV%" (
-  for /f "usebackq tokens=1,* delims==" %%A in ("%OFFLINE_ENV%") do (
-    set "line=%%A"
-    if not "!line:~0,1!"=="#" if not "%%A"=="" set "%%A=%%B"
+  for /f "usebackq delims=" %%L in (`powershell -NoProfile -Command "Get-Content -LiteralPath '%OFFLINE_ENV%' | ForEach-Object { $_.TrimEnd() } | Where-Object { $_ -notmatch '^\s*#' -and $_.Trim() -ne '' }"`) do (
+    for /f "tokens=1,* delims==" %%A in ("%%L") do (
+      if not "%%A"=="" set "%%A=%%B"
+    )
   )
 )
 
@@ -49,7 +52,7 @@ if not exist "%_VER_TMP%" (
   echo Error: API request failed. Check network connectivity and APP_VERSION_URL in .env.offline.
   goto :end
 )
-for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "(Get-Content -LiteralPath '%_VER_TMP%' -Raw | ConvertFrom-Json).POS_OFFLINE_BUNDLE_APP_VERSION"`) do set "RESOLVED_VERSION=%%V"
+for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "(Get-Content -LiteralPath '%_VER_TMP%' -Raw | ConvertFrom-Json).POS_OFFLINE_BUNDLE_APP_VERSION.Trim()"`) do set "RESOLVED_VERSION=%%V"
 del "%_VER_TMP%" >nul 2>&1
 
 if not defined RESOLVED_VERSION (
@@ -60,6 +63,8 @@ if not defined RESOLVED_VERSION (
 
 echo Resolved version: %RESOLVED_VERSION%
 set "APP_ZIP_URL=!APP_ZIP_URL:APP_VERSION=%RESOLVED_VERSION%!"
+REM Strip any stray \r that may have come from a CRLF .env.offline entry
+for /f "tokens=* delims=" %%U in ("!APP_ZIP_URL!") do set "APP_ZIP_URL=%%U"
 
 echo Using ZIP URL: %APP_ZIP_URL%
 
@@ -108,6 +113,13 @@ if errorlevel 1 (
   echo Run: docker compose -f "%COMPOSE_FILE%" logs --tail=200 app web
   goto :end
 )
+
+REM Strip CRLF from the live .env inside the container and regenerate the key.
+REM This is the definitive fix for "No application encryption key" on Windows:
+REM the .env.example from the ZIP may have CRLF, making APP_KEY=base64:xxx\r
+REM which Laravel rejects even though the key looks correct in a text editor.
+echo Fixing Laravel .env line endings and encryption key...
+docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "sed -i 's/\r$//' /var/www/html/.env && php artisan key:generate --force --no-interaction && php artisan config:clear" >nul 2>&1
 
 echo Setup complete. App is reachable at http://localhost:8080/login
 

@@ -18,7 +18,7 @@ fi
 
 COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT/docker-compose.github.yml}"
 APP_ZIP_URL="${APP_ZIP_URL:-https://taxnomist.busywizzy.com/pos_APP_VERSION.zip}"
-APP_VERSION_URL="${APP_VERSION_URL:-https://agretail.ddev.site/api/offline/version}"
+APP_VERSION_URL="${APP_VERSION_URL:-}"
 APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
 OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
@@ -33,9 +33,11 @@ fi
 sync_offline_env_into_app_env() {
   local resolved_zip_url="${1:-}"
 
-  # Collect all non-comment, non-empty lines from .env.offline
+  # Collect all non-comment, non-empty lines from .env.offline.
+  # tr -d '\r' strips Windows CRLF so values don't land in the container .env
+  # with a trailing carriage return (which breaks APP_KEY and other vars).
   local env_lines
-  env_lines="$(grep -v '^\s*#' "$OFFLINE_ENV_FILE" | grep -v '^\s*$' || true)"
+  env_lines="$(grep -v '^\s*#' "$OFFLINE_ENV_FILE" | grep -v '^\s*$' | tr -d '\r' || true)"
   if [[ -z "$env_lines" ]]; then
     return 0
   fi
@@ -48,6 +50,9 @@ cd /var/www/html
 if [ ! -f .env ]; then
   [ -f .env.example ] && cp .env.example .env || exit 0
 fi
+
+# Strip any CRLF already present in the container .env before rewriting values.
+sed -i "s/\r$//" .env 2>/dev/null || true
 
 set_kv() {
   key="$1"
@@ -180,7 +185,6 @@ if [[ "$old_version" == "$new_version" ]]; then
   echo "Syncing .env.offline values into app .env..."
   sync_offline_env_into_app_env "$APP_ZIP_URL"
   ensure_scheduler_sync_keys
-  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "cd /var/www/html && grep -q '^POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}$' .env || echo 'POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}' >> .env"
   exit 0
 fi
 
@@ -250,7 +254,6 @@ fi
 echo "Syncing .env.offline values into app .env..."
 sync_offline_env_into_app_env "$resolved_zip_url"
 ensure_scheduler_sync_keys
-docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "cd /var/www/html && grep -q '^POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}$' .env || echo 'POS_OFFLINE_SYNC_STORE_ID=${OFFLINE_STORE_ID}' >> .env"
 
 docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
 cd /var/www/html
