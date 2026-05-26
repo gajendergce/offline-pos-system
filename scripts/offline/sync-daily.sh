@@ -56,7 +56,7 @@ sed -i "s/\r$//" .env 2>/dev/null || true
 
 set_kv() {
   key="$1"
-  val="$2"
+  val="$(printf '%s' "$2" | sed 's/[[:space:]]*$//')"
   [ -z "$key" ] && return 0
   tmpfile="$(mktemp)"
   grep -v "^${key}=" .env > "$tmpfile" || true

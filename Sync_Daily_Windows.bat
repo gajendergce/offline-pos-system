@@ -122,6 +122,12 @@ powershell -NoProfile -Command "Start-Sleep -Seconds 2" >nul
 goto :boot_wait
 
 :boot_ready
+REM Regenerate APP_KEY using PHP built-ins if not already set.
+REM php artisan key:generate cannot run if .env is invalid (catch-22), so we
+REM use raw PHP file I/O which requires no Laravel bootstrap at all.
+echo Generating encryption key if not set...
+docker compose -f "%COMPOSE_FILE%" exec -T app php -r "$e=file_get_contents('/var/www/html/.env');if(preg_match('/^APP_KEY=\S/m',$e))exit;$k='base64:'.base64_encode(random_bytes(32));$e=preg_match('/^APP_KEY=/m',$e)?preg_replace('/^APP_KEY=.*/m','APP_KEY='.$k,$e):$e.chr(10).'APP_KEY='.$k;file_put_contents('/var/www/html/.env',$e);" 2>nul
+
 echo Running post-sync maintenance ^(migrations, cache clear^)...
 docker compose -f "%COMPOSE_FILE%" exec -T -u root app sh -lc "cd /var/www/html && if [ -f .env ]; then if grep -q '^POS_OFFLINE_MODE=' .env; then sed -i 's|^POS_OFFLINE_MODE=.*|POS_OFFLINE_MODE=true|' .env; else echo 'POS_OFFLINE_MODE=true' >> .env; fi; fi && mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache/data storage/logs bootstrap/cache && chown -R www-data:www-data storage bootstrap/cache && chmod -R 777 storage && php artisan optimize:clear && php artisan migrate --path=database/offline_migrations --force --no-interaction || true"
 
@@ -154,7 +160,7 @@ REM Write cleaned lines to a temp file (no comments, no blanks, no CRLF).
 set "_ENVLINES_TMP=%TEMP%\pos_envlines_%RANDOM%.txt"
 powershell -NoProfile -Command "Get-Content -LiteralPath '%OFFLINE_ENV%' | ForEach-Object { $_.TrimEnd() } | Where-Object { $_ -notmatch '^\s*#' -and $_.Trim() -ne '' } | Set-Content -Encoding UTF8 -LiteralPath '%_ENVLINES_TMP%'"
 if not exist "%_ENVLINES_TMP%" exit /b 0
-type "%_ENVLINES_TMP%" | docker compose -f "%COMPOSE_FILE%" exec -T app sh -lc "cd /var/www/html; [ -f .env ] || { [ -f .env.example ] && cp .env.example .env || exit 0; }; sed -i 's/\r$//' .env 2>/dev/null || true; while IFS= read -r line; do case \"$line\" in ''|'#'*) continue;; esac; key=\"${line%%%%=*}\"; val=\"${line#*=}\"; tmpf=\"$(mktemp)\"; grep -v \"^${key}=\" .env > \"$tmpf\" 2>/dev/null || true; printf '%%s=%%s\n' \"$key\" \"$val\" >> \"$tmpf\"; mv \"$tmpf\" .env; done; php artisan config:clear >/dev/null 2>&1 || true"
+type "%_ENVLINES_TMP%" | docker compose -f "%COMPOSE_FILE%" exec -T app sh -lc "cd /var/www/html; [ -f .env ] || { [ -f .env.example ] && cp .env.example .env || exit 0; }; sed -i 's/\r$//' .env 2>/dev/null || true; while IFS= read -r line; do case \"$line\" in ''|'#'*) continue;; esac; key=\"${line%%%%=*}\"; val=\"$(printf '%%s' \"${line#*=}\" | sed 's/[[:space:]]*$//')\"; tmpf=\"$(mktemp)\"; grep -v \"^${key}=\" .env > \"$tmpf\" 2>/dev/null || true; printf '%%s=%%s\n' \"$key\" \"$val\" >> \"$tmpf\"; mv \"$tmpf\" .env; done; php artisan config:clear >/dev/null 2>&1 || true"
 del "%_ENVLINES_TMP%" >nul 2>&1
 exit /b 0
 

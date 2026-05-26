@@ -47,7 +47,7 @@ fi
 
 set_kv() {
   key="$1"
-  val="$2"
+  val="$(printf '%s' "$2" | sed 's/[[:space:]]*$//')"
   if [ -z "$val" ]; then
     return 0
   fi

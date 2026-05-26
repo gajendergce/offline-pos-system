@@ -194,7 +194,7 @@ fi
 
 set_env_value() {
   key="$1"
-  value="$2"
+  value="$(printf '%s' "$2" | sed 's/[[:space:]]*$//')"
   if grep -q "^${key}=" .env; then
     sed -i "s|^${key}=.*|${key}=${value}|" .env
   else
