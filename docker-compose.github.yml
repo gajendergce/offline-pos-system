@@ -21,7 +21,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      APP_ZIP_URL: ${APP_ZIP_URL:-http://taxnomist.busywizzy.com/pos_1.0.zip}
+      APP_ZIP_URL: ${APP_ZIP_URL:-https://taxnomist.busywizzy.com/pos_APP_VERSION.zip}
       APP_SYNC_ZIP_ON_START: ${APP_SYNC_ZIP_ON_START:-1}
       APP_VERSION_URL: ${APP_VERSION_URL:-}
       APP_TARGET_VERSION: ${APP_TARGET_VERSION:-}

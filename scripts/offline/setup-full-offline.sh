@@ -96,7 +96,10 @@ fetch_target_version() {
   fi
 }
 
-if [[ "$APP_ZIP_URL" == *APP_VERSION* ]]; then
+# When APP_ZIP_URL contains APP_VERSION and APP_VERSION_URL is set, let the
+# container handle version resolution on every start so it can detect upgrades.
+# Only pre-resolve here when no version API is configured (direct URL given).
+if [[ "$APP_ZIP_URL" == *APP_VERSION* ]] && [[ -z "$APP_VERSION_URL" ]]; then
   resolved_version="$(fetch_target_version || true)"
   if [[ -z "$resolved_version" ]]; then
     echo "Error: could not resolve app version from API. Check OFFLINE_STORE_ID/OFFLINE_TOKEN/APP_VERSION_URL."
@@ -135,6 +138,7 @@ echo "DB setup mode: $DB_SETUP_MODE"
 cd "$PROJECT_ROOT"
 
 APP_ZIP_URL="$APP_ZIP_URL" \
+APP_VERSION_URL="$APP_VERSION_URL" \
 APP_SYNC_ZIP_ON_START="$APP_SYNC_ZIP_ON_START" \
 DB_SETUP_MODE="$DB_SETUP_MODE" \
 DB_DATABASE="$DB_DATABASE" \

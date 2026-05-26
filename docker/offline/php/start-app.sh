@@ -20,12 +20,13 @@ if [ -z "$APP_ZIP_URL" ]; then
 fi
 
 download_and_extract_zip() {
+  _dl_url="${1:-$APP_ZIP_URL}"
   tmp_dir="$(mktemp -d)"
   zip_file="${tmp_dir}/app.zip"
 
-  echo "Downloading Laravel ZIP from APP_ZIP_URL..."
-  if ! curl -fsSL "$APP_ZIP_URL" -o "$zip_file"; then
-    echo "Failed to download ZIP from APP_ZIP_URL"
+  echo "Downloading Laravel ZIP from ${_dl_url}..."
+  if ! curl -fsSL "$_dl_url" -o "$zip_file"; then
+    echo "Failed to download ZIP from ${_dl_url}"
     rm -rf "$tmp_dir"
     exit 1
   fi
@@ -65,7 +66,11 @@ fetch_target_version() {
   fi
 
   compact="$(printf "%s" "$response" | tr -d '\r\n')"
-  parsed="$(printf "%s" "$compact" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+
+  if [ -z "$parsed" ]; then
+    parsed="$(printf "%s" "$compact" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  fi
 
   if [ -n "$parsed" ]; then
     printf "%s" "$parsed"
@@ -95,8 +100,9 @@ sync_from_version_if_needed() {
     exit 1
   fi
 
+  _versioned_url="$(printf '%s' "$APP_ZIP_URL" | sed "s/APP_VERSION/${target_version}/g")"
   echo "Target app version ${target_version} differs from local version; syncing ZIP."
-  download_and_extract_zip
+  download_and_extract_zip "$_versioned_url"
   printf "%s" "$target_version" > "$VERSION_MARKER_FILE"
   touch "$SYNC_MARKER_FILE"
   return 0
@@ -120,33 +126,47 @@ case "$APP_ENABLE_VERSION_SYNC_ON_START" in
     version_sync_on_start=1
     ;;
 esac
+# Auto-enable version sync when APP_VERSION_URL is configured.
+if [ "$version_sync_on_start" -eq 0 ] && [ -n "$APP_VERSION_URL" ]; then
+  version_sync_on_start=1
+fi
+
+_zip_has_placeholder=0
+case "$APP_ZIP_URL" in
+  *APP_VERSION*) _zip_has_placeholder=1 ;;
+esac
 
 if [ "$version_sync_on_start" -eq 1 ] && ! sync_from_version_if_needed; then
-if [ -n "$APP_ZIP_URL" ] && [ "$should_sync_zip" -eq 1 ]; then
-  if [ "$always_sync_zip" -eq 1 ] || [ ! -f "$SYNC_MARKER_FILE" ]; then
-    echo "Syncing app code from ZIP."
+  # Version API failed to return a version.
+  # Skip download if URL still contains unresolved APP_VERSION placeholder.
+  if [ "$_zip_has_placeholder" -eq 0 ] && [ -n "$APP_ZIP_URL" ] && [ "$should_sync_zip" -eq 1 ]; then
+    if [ "$always_sync_zip" -eq 1 ] || [ ! -f "$SYNC_MARKER_FILE" ]; then
+      echo "Syncing app code from ZIP."
+      download_and_extract_zip
+      touch "$SYNC_MARKER_FILE"
+    else
+      echo "ZIP sync already completed once; skipping re-sync on restart."
+    fi
+  elif [ ! -f artisan ] && [ "$_zip_has_placeholder" -eq 0 ] && [ -n "$APP_ZIP_URL" ]; then
     download_and_extract_zip
     touch "$SYNC_MARKER_FILE"
-  else
-    echo "ZIP sync already completed once; skipping re-sync on restart."
+  elif [ ! -f artisan ]; then
+    echo "Version API unavailable and APP_ZIP_URL contains unresolved APP_VERSION; cannot bootstrap app."
+    exit 1
   fi
-elif [ ! -f artisan ] && [ -n "$APP_ZIP_URL" ]; then
-  download_and_extract_zip
-  touch "$SYNC_MARKER_FILE"
-fi
 elif [ "$version_sync_on_start" -eq 0 ]; then
-if [ -n "$APP_ZIP_URL" ] && [ "$should_sync_zip" -eq 1 ]; then
-  if [ "$always_sync_zip" -eq 1 ] || [ ! -f "$SYNC_MARKER_FILE" ]; then
-    echo "Syncing app code from ZIP."
+  if [ -n "$APP_ZIP_URL" ] && [ "$should_sync_zip" -eq 1 ]; then
+    if [ "$always_sync_zip" -eq 1 ] || [ ! -f "$SYNC_MARKER_FILE" ]; then
+      echo "Syncing app code from ZIP."
+      download_and_extract_zip
+      touch "$SYNC_MARKER_FILE"
+    else
+      echo "ZIP sync already completed once; skipping re-sync on restart."
+    fi
+  elif [ ! -f artisan ] && [ -n "$APP_ZIP_URL" ]; then
     download_and_extract_zip
     touch "$SYNC_MARKER_FILE"
-  else
-    echo "ZIP sync already completed once; skipping re-sync on restart."
   fi
-elif [ ! -f artisan ] && [ -n "$APP_ZIP_URL" ]; then
-  download_and_extract_zip
-  touch "$SYNC_MARKER_FILE"
-fi
 fi
 
 if [ ! -f .env ] && [ -f .env.example ]; then

@@ -39,34 +39,13 @@ if exist "%OFFLINE_ENV%" (
   )
 )
 
-REM Resolve ZIP URL: replace APP_VERSION placeholder via API
+REM Keep APP_ZIP_URL as a template (APP_VERSION placeholder intact) so the
+REM container can resolve the version on every start and detect upgrades.
 if not defined APP_ZIP_URL set "APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip"
+if not defined APP_VERSION_URL set "APP_VERSION_URL=https://taxnomist.busywizzy.com/api/offline/version"
 
-echo Fetching latest app version from API...
-set "_BODY_TMP=%TEMP%\pos_body_%RANDOM%.json"
-set "_VER_TMP=%TEMP%\pos_ver_%RANDOM%.json"
-powershell -NoProfile -Command "$body = ConvertTo-Json @{store_id = %OFFLINE_STORE_ID%; offline_token = '%OFFLINE_TOKEN%'}; [IO.File]::WriteAllText('%_BODY_TMP%', $body)"
-curl.exe -s --ssl-no-revoke --location --request GET "%APP_VERSION_URL%" --header "Content-Type: application/json" --data @"%_BODY_TMP%" --output "%_VER_TMP%"
-del "%_BODY_TMP%" >nul 2>&1
-if not exist "%_VER_TMP%" (
-  echo Error: API request failed. Check network connectivity and APP_VERSION_URL in .env.offline.
-  goto :end
-)
-for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "(Get-Content -LiteralPath '%_VER_TMP%' -Raw | ConvertFrom-Json).POS_OFFLINE_BUNDLE_APP_VERSION.Trim()"`) do set "RESOLVED_VERSION=%%V"
-del "%_VER_TMP%" >nul 2>&1
-
-if not defined RESOLVED_VERSION (
-  echo Error: could not resolve app version from API.
-  echo Check APP_VERSION_URL, OFFLINE_STORE_ID and OFFLINE_TOKEN in .env.offline.
-  goto :end
-)
-
-echo Resolved version: %RESOLVED_VERSION%
-set "APP_ZIP_URL=!APP_ZIP_URL:APP_VERSION=%RESOLVED_VERSION%!"
-REM Strip any stray \r that may have come from a CRLF .env.offline entry
-for /f "tokens=* delims=" %%U in ("!APP_ZIP_URL!") do set "APP_ZIP_URL=%%U"
-
-echo Using ZIP URL: %APP_ZIP_URL%
+echo Using ZIP template: %APP_ZIP_URL%
+echo Version API: %APP_VERSION_URL%
 
 docker compose -f "%COMPOSE_FILE%" up -d --build
 if errorlevel 1 (
