@@ -39,9 +39,6 @@ RUN docker-php-ext-install \
     ctype \
     json
 
-# Install Redis extension via PECL
-RUN pecl install redis-5.3.7 \
-    && docker-php-ext-enable redis
 
 # Install Composer 2.2 (last version supporting PHP 7.4)
 COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer

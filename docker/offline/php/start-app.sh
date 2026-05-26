@@ -233,6 +233,10 @@ set_env_value "DB_READ_DATABASE" "${DB_READ_DATABASE:-${DB_DATABASE:-agrtl_offli
 set_env_value "DB_READ_USERNAME" "${DB_READ_USERNAME:-${DB_USERNAME:-app}}"
 set_env_value "DB_READ_PASSWORD" "${DB_READ_PASSWORD:-${DB_PASSWORD:-app123}}"
 set_env_value "POS_OFFLINE_MODE" "${POS_OFFLINE_MODE:-true}"
+# Offline deployments have no Redis — use file/database drivers instead.
+set_env_value "CACHE_DRIVER"      "${CACHE_DRIVER:-file}"
+set_env_value "SESSION_DRIVER"    "${SESSION_DRIVER:-file}"
+set_env_value "QUEUE_CONNECTION"  "${QUEUE_CONNECTION:-database}"
 [ -n "${OFFLINE_API_BASE_URL:-}" ]        && set_env_value "OFFLINE_API_BASE_URL"        "$OFFLINE_API_BASE_URL"
 [ -n "${POS_OFFLINE_SYNC_STORE_ID:-}" ]   && set_env_value "POS_OFFLINE_SYNC_STORE_ID"   "$POS_OFFLINE_SYNC_STORE_ID"
 [ -n "${POS_OFFLINE_SYNC_SOURCE_URL:-}" ] && set_env_value "POS_OFFLINE_SYNC_SOURCE_URL" "$POS_OFFLINE_SYNC_SOURCE_URL"
