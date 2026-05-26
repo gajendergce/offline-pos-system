@@ -96,11 +96,6 @@ fetch_target_version() {
   fi
 }
 
-if [[ -z "$APP_ZIP_URL" ]]; then
-  echo "Error: APP_ZIP_URL is not set. Pass URL argument or define APP_ZIP_URL in .env.offline."
-  exit 1
-fi
-
 if [[ "$APP_ZIP_URL" == *APP_VERSION* ]]; then
   resolved_version="$(fetch_target_version || true)"
   if [[ -z "$resolved_version" ]]; then
@@ -178,6 +173,10 @@ chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
 chmod -R 777 storage
 
+if grep -q "^APP_KEY=$" .env 2>/dev/null || ! grep -q "^APP_KEY=" .env 2>/dev/null; then
+  php artisan key:generate --force --no-interaction
+fi
+
 php artisan optimize:clear
 php artisan migrate --path=database/offline_migrations --force --no-interaction || true
 '; then
@@ -199,6 +198,13 @@ echo "Waiting for app endpoint to become ready..."
 for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
   status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
   if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
+    echo "Ensuring encryption key is set..."
+    docker compose -f "$COMPOSE_FILE" exec -T app sh -c \
+      "sed -i 's/\r\$//' /var/www/html/.env
+       if grep -q '^APP_KEY=\$' /var/www/html/.env 2>/dev/null || ! grep -q '^APP_KEY=' /var/www/html/.env 2>/dev/null; then
+         php artisan key:generate --force --no-interaction && php artisan config:clear
+       fi" \
+      >/dev/null 2>&1 || true
     echo "Setup complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
     echo "Tip: code sync runs once on first startup and skips on container restarts by default."
     echo "To force sync every start, run with APP_SYNC_ZIP_ON_START=always."

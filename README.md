@@ -21,7 +21,7 @@ Install on the new computer:
 
 ```bash
 git clone <this-repo-url>
-cd offline-pos-docker
+cd offline-pos-system
 ```
 
 ## Configure Offline Sync Credentials
@@ -168,7 +168,7 @@ What it does:
 Cron example (daily at 2:00 AM):
 
 ```bash
-0 2 * * * cd /path/to/offline-pos-docker && APP_VERSION_URL=https://agretail.ddev.site/api/offline/version APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip ./scripts/offline/sync-daily.sh >> /var/log/offline-pos-sync.log 2>&1
+0 2 * * * cd /path/to/offline-pos-system && APP_VERSION_URL=https://agretail.ddev.site/api/offline/version APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip ./scripts/offline/sync-daily.sh >> /var/log/offline-pos-sync.log 2>&1
 ```
 
 ## Migrations

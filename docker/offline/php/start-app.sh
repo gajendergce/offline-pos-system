@@ -206,6 +206,10 @@ chmod -R 777 storage /var/www/html/pos/storage
 
 composer install --no-interaction --prefer-dist --optimize-autoloader
 
+if grep -q "^APP_KEY=$" .env 2>/dev/null || ! grep -q "^APP_KEY=" .env 2>/dev/null; then
+  php artisan key:generate --force --no-interaction
+fi
+
 # Replace any amd64 wkhtmltopdf vendor binary with the native system binary.
 # Packages like h4cc/wkhtmltopdf-amd64 bundle an x86_64 ELF which crashes on arm64.
 WKHTML_SYS="$(command -v wkhtmltopdf 2>/dev/null || true)"
@@ -242,8 +246,6 @@ case "$DB_SETUP_MODE" in
     done
     ;;
 esac
-
-php artisan key:generate --force || true
 
 php artisan config:clear || true
 php artisan view:clear || true

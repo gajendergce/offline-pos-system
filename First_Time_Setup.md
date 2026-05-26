@@ -25,11 +25,11 @@ docker compose version
 
 ## Step 2: Get the Project Files
 
-Either clone the repository or copy the `offline-pos-docker` folder onto the new computer.
+Either clone the repository or copy the `offline-pos-system` folder onto the new computer.
 
 ```bash
 git clone <this-repo-url>
-cd offline-pos-docker
+cd offline-pos-system
 ```
 
 After this you should see [docker-compose.github.yml](docker-compose.github.yml), [.env.offline](.env.offline), and the OS launcher files in the project root.
@@ -141,7 +141,7 @@ Set up a cron job (Linux/macOS) or Task Scheduler entry (Windows) to pull new ap
 Linux/macOS cron example (2:00 AM daily):
 
 ```bash
-0 2 * * * cd /path/to/offline-pos-docker && ./scripts/offline/sync-daily.sh >> /var/log/offline-pos-sync.log 2>&1
+0 2 * * * cd /path/to/offline-pos-system && ./scripts/offline/sync-daily.sh >> /var/log/offline-pos-sync.log 2>&1
 ```
 
 The script reads `.env.offline`, calls `APP_VERSION_URL`, and only re-syncs when the version differs from the locally stored one.

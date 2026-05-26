@@ -4,7 +4,7 @@ set -euo pipefail
 # Usage:
 #   ./scripts/offline/setup-from-github.sh <zip_url> [target_dir]
 # Example:
-#   ./scripts/offline/setup-from-github.sh https://example.com/offline-pos-docker.zip /opt/offlinepos
+#   ./scripts/offline/setup-from-github.sh https://example.com/offline-pos-system.zip /opt/offlinepos
 
 ZIP_URL="${1:-}"
 TARGET_DIR="${2:-./offlinepos}"
