@@ -9,6 +9,9 @@ APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 VERSION_MARKER_FILE="${APP_VERSION_MARKER_FILE:-/var/www/html/.zip_sync_version}"
 APP_ENABLE_VERSION_SYNC_ON_START="${APP_ENABLE_VERSION_SYNC_ON_START:-0}"
 DB_SETUP_MODE="${DB_SETUP_MODE:-structure}"
+# Credentials for the version API — fall back through several common env var names.
+OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-${POS_OFFLINE_SYNC_STORE_ID:-}}"
+OFFLINE_TOKEN="${OFFLINE_TOKEN:-${POS_OFFLINE_SYNC_TOKEN:-}}"
 
 cd /var/www/html
 if [ -z "$APP_ZIP_URL" ]; then
@@ -60,7 +63,10 @@ fetch_target_version() {
     return 0
   fi
 
-  response="$(curl -fsSL "$APP_VERSION_URL" || true)"
+  _payload="{\"store_id\": ${OFFLINE_STORE_ID:-0}, \"offline_token\": \"${OFFLINE_TOKEN:-}\"}"
+  response="$(curl -fsSL --request GET "$APP_VERSION_URL" \
+    --header 'Content-Type: application/json' \
+    --data "$_payload" || true)"
   if [ -z "$response" ]; then
     return 0
   fi
@@ -121,13 +127,18 @@ case "$APP_SYNC_ZIP_ON_START" in
 esac
 
 version_sync_on_start=0
+_version_sync_explicit=0
 case "$APP_ENABLE_VERSION_SYNC_ON_START" in
   1|true|TRUE|yes|YES)
     version_sync_on_start=1
+    _version_sync_explicit=1
+    ;;
+  0|false|FALSE|no|NO)
+    _version_sync_explicit=1
     ;;
 esac
-# Auto-enable version sync when APP_VERSION_URL is configured.
-if [ "$version_sync_on_start" -eq 0 ] && [ -n "$APP_VERSION_URL" ]; then
+# Auto-enable version sync when APP_VERSION_URL is configured, unless explicitly disabled.
+if [ "$_version_sync_explicit" -eq 0 ] && [ -n "$APP_VERSION_URL" ]; then
   version_sync_on_start=1
 fi
 
