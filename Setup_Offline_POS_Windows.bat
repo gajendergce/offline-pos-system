@@ -106,6 +106,31 @@ if errorlevel 1 (
 )
 
 :after_grant
+
+REM Wait for composer install to finish inside the app container.
+REM key:generate requires vendor/autoload.php to exist first.
+echo Waiting for app dependencies (composer install)...
+set /a _VENDOR_TRIES=0
+:vendor_wait
+docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "test -f /var/www/html/vendor/autoload.php" >nul 2>&1
+if not errorlevel 1 goto :vendor_ready
+set /a _VENDOR_TRIES+=1
+if %_VENDOR_TRIES% geq 150 (
+  echo WARNING: dependencies not ready after 5 minutes -- proceeding anyway.
+  goto :after_key
+)
+powershell -NoProfile -Command "Start-Sleep -Seconds 2" >nul
+goto :vendor_wait
+
+:vendor_ready
+REM Strip CRLF from .env and generate APP_KEY *before* checking app readiness.
+REM Previously key:generate ran after the endpoint check, but the app returns
+REM HTTP 500 when APP_KEY is missing, so the check always timed out and
+REM key:generate was never reached (goto :end short-circuits it).
+echo Fixing .env line endings and generating encryption key...
+docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "cd /var/www/html && sed -i 's/\r$//' .env && grep -q '^APP_KEY=.' .env 2>/dev/null || (php artisan key:generate --force --no-interaction && php artisan config:clear)" >nul 2>&1
+
+:after_key
 echo Waiting for app endpoint to become ready...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$ok=$false; for($i=0;$i -lt 90;$i++){ try { $resp = Invoke-WebRequest -Uri 'http://localhost:8080/login' -MaximumRedirection 0 -ErrorAction Stop; if($resp.StatusCode -eq 200 -or $resp.StatusCode -eq 302){ $ok=$true; break } } catch { if($_.Exception.Response -and ($_.Exception.Response.StatusCode.Value__ -eq 302)){ $ok=$true; break } }; Start-Sleep -Seconds 2 }; if($ok){ exit 0 } else { exit 1 }"
 if errorlevel 1 (
@@ -113,13 +138,6 @@ if errorlevel 1 (
   echo Run: docker compose -f "%COMPOSE_FILE%" logs --tail=200 app web
   goto :end
 )
-
-REM Strip CRLF from the live .env inside the container and regenerate the key.
-REM This is the definitive fix for "No application encryption key" on Windows:
-REM the .env.example from the ZIP may have CRLF, making APP_KEY=base64:xxx\r
-REM which Laravel rejects even though the key looks correct in a text editor.
-echo Fixing Laravel .env line endings and encryption key...
-docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "sed -i 's/\r$//' /var/www/html/.env && php artisan key:generate --force --no-interaction && php artisan config:clear" >nul 2>&1
 
 echo Setup complete. App is reachable at http://localhost:8080/login
 
