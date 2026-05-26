@@ -252,7 +252,9 @@ if [[ "${maintenance_ok:-0}" -ne 1 ]]; then
 fi
 
 echo "Syncing .env.offline values into app .env..."
-sync_offline_env_into_app_env "$resolved_zip_url"
+# Pass the template URL (APP_VERSION placeholder) not the resolved URL so
+# that start-app.sh can substitute the version on future restarts.
+sync_offline_env_into_app_env "$APP_ZIP_URL"
 ensure_scheduler_sync_keys
 
 docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "

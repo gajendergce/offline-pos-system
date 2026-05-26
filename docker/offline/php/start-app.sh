@@ -7,13 +7,28 @@ SYNC_MARKER_FILE="${APP_SYNC_MARKER_FILE:-/var/www/html/.zip_sync_done}"
 APP_VERSION_URL="${APP_VERSION_URL:-}"
 APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 VERSION_MARKER_FILE="${APP_VERSION_MARKER_FILE:-/var/www/html/.zip_sync_version}"
-APP_ENABLE_VERSION_SYNC_ON_START="${APP_ENABLE_VERSION_SYNC_ON_START:-0}"
+APP_ENABLE_VERSION_SYNC_ON_START="${APP_ENABLE_VERSION_SYNC_ON_START:-}"
 DB_SETUP_MODE="${DB_SETUP_MODE:-structure}"
 # Credentials for the version API — fall back through several common env var names.
 OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-${POS_OFFLINE_SYNC_STORE_ID:-}}"
 OFFLINE_TOKEN="${OFFLINE_TOKEN:-${POS_OFFLINE_SYNC_TOKEN:-}}"
 
 cd /var/www/html
+
+# On a plain container restart (docker compose restart / up -d without env vars)
+# Docker does not re-inject env vars from the host shell.  Read any missing
+# version-sync vars back from the persisted .env so the version check still
+# works between daily syncs.
+if [ -f .env ]; then
+  _env_val() { grep "^${1}=" .env 2>/dev/null | head -n1 | cut -d= -f2- | sed 's/[[:space:]]*$//'; }
+  [ -z "$APP_VERSION_URL" ]  && APP_VERSION_URL="$(_env_val APP_VERSION_URL)"
+  [ -z "$APP_ZIP_URL" ]      && APP_ZIP_URL="$(_env_val APP_ZIP_URL)"
+  [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val OFFLINE_STORE_ID)"
+  [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val OFFLINE_TOKEN)"
+  [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val POS_OFFLINE_SYNC_STORE_ID)"
+  [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val POS_OFFLINE_SYNC_TOKEN)"
+fi
+
 if [ -z "$APP_ZIP_URL" ]; then
   if [ ! -f artisan ]; then
     echo "APP_ZIP_URL is required for first startup when app code is missing"
@@ -147,6 +162,11 @@ case "$APP_ZIP_URL" in
   *APP_VERSION*) _zip_has_placeholder=1 ;;
 esac
 
+_stamp_markers() {
+  touch "$SYNC_MARKER_FILE"
+  [ -n "$APP_TARGET_VERSION" ] && printf "%s" "$APP_TARGET_VERSION" > "$VERSION_MARKER_FILE"
+}
+
 if [ "$version_sync_on_start" -eq 1 ] && ! sync_from_version_if_needed; then
   # Version API failed to return a version.
   # Skip download if URL still contains unresolved APP_VERSION placeholder.
@@ -154,13 +174,13 @@ if [ "$version_sync_on_start" -eq 1 ] && ! sync_from_version_if_needed; then
     if [ "$always_sync_zip" -eq 1 ] || [ ! -f "$SYNC_MARKER_FILE" ]; then
       echo "Syncing app code from ZIP."
       download_and_extract_zip
-      touch "$SYNC_MARKER_FILE"
+      _stamp_markers
     else
       echo "ZIP sync already completed once; skipping re-sync on restart."
     fi
   elif [ ! -f artisan ] && [ "$_zip_has_placeholder" -eq 0 ] && [ -n "$APP_ZIP_URL" ]; then
     download_and_extract_zip
-    touch "$SYNC_MARKER_FILE"
+    _stamp_markers
   elif [ ! -f artisan ]; then
     echo "Version API unavailable and APP_ZIP_URL contains unresolved APP_VERSION; cannot bootstrap app."
     exit 1
@@ -170,13 +190,13 @@ elif [ "$version_sync_on_start" -eq 0 ]; then
     if [ "$always_sync_zip" -eq 1 ] || [ ! -f "$SYNC_MARKER_FILE" ]; then
       echo "Syncing app code from ZIP."
       download_and_extract_zip
-      touch "$SYNC_MARKER_FILE"
+      _stamp_markers
     else
       echo "ZIP sync already completed once; skipping re-sync on restart."
     fi
   elif [ ! -f artisan ] && [ -n "$APP_ZIP_URL" ]; then
     download_and_extract_zip
-    touch "$SYNC_MARKER_FILE"
+    _stamp_markers
   fi
 fi
 
@@ -217,6 +237,17 @@ set_env_value "POS_OFFLINE_MODE" "${POS_OFFLINE_MODE:-true}"
 [ -n "${POS_OFFLINE_SYNC_STORE_ID:-}" ]   && set_env_value "POS_OFFLINE_SYNC_STORE_ID"   "$POS_OFFLINE_SYNC_STORE_ID"
 [ -n "${POS_OFFLINE_SYNC_SOURCE_URL:-}" ] && set_env_value "POS_OFFLINE_SYNC_SOURCE_URL" "$POS_OFFLINE_SYNC_SOURCE_URL"
 [ -n "${POS_OFFLINE_SYNC_TOKEN:-}" ]      && set_env_value "POS_OFFLINE_SYNC_TOKEN"      "$POS_OFFLINE_SYNC_TOKEN"
+# Persist version-sync config so it survives plain container restarts where
+# Docker env vars are not re-injected from the host shell.
+[ -n "${APP_VERSION_URL:-}" ]             && set_env_value "APP_VERSION_URL"             "$APP_VERSION_URL"
+[ -n "${OFFLINE_STORE_ID:-}" ]            && set_env_value "OFFLINE_STORE_ID"            "$OFFLINE_STORE_ID"
+[ -n "${OFFLINE_TOKEN:-}" ]               && set_env_value "OFFLINE_TOKEN"               "$OFFLINE_TOKEN"
+# Always write the ZIP URL template (with APP_VERSION placeholder) not a
+# resolved URL, so that version substitution works on the next version bump.
+if [ -n "${APP_ZIP_URL:-}" ]; then
+  _template_url="$(printf '%s' "$APP_ZIP_URL" | sed "s/${APP_TARGET_VERSION:-NEVER_MATCH}/APP_VERSION/g")"
+  set_env_value "APP_ZIP_URL" "$_template_url"
+fi
 
 mkdir -p storage/framework/sessions \
          storage/framework/views \
