@@ -107,28 +107,28 @@ if errorlevel 1 (
 
 :after_grant
 
-REM Wait for composer install to finish inside the app container.
-REM key:generate requires vendor/autoload.php to exist first.
-echo Waiting for app dependencies (composer install)...
-set /a _VENDOR_TRIES=0
-:vendor_wait
-docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "test -f /var/www/html/vendor/autoload.php" >nul 2>&1
-if not errorlevel 1 goto :vendor_ready
-set /a _VENDOR_TRIES+=1
-if %_VENDOR_TRIES% geq 150 (
-  echo WARNING: dependencies not ready after 5 minutes -- proceeding anyway.
+REM Wait for .env to appear inside the app container.
+REM It is created right after the ZIP is extracted -- well before composer finishes.
+echo Waiting for app to initialise...
+set /a _ENV_TRIES=0
+:env_wait
+docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "test -f /var/www/html/.env" >nul 2>&1
+if not errorlevel 1 goto :env_ready
+set /a _ENV_TRIES+=1
+if %_ENV_TRIES% geq 150 (
+  echo WARNING: .env not ready after 5 minutes -- proceeding anyway.
   goto :after_key
 )
 powershell -NoProfile -Command "Start-Sleep -Seconds 2" >nul
-goto :vendor_wait
+goto :env_wait
 
-:vendor_ready
-REM Strip CRLF from .env and generate APP_KEY *before* checking app readiness.
-REM Previously key:generate ran after the endpoint check, but the app returns
-REM HTTP 500 when APP_KEY is missing, so the check always timed out and
-REM key:generate was never reached (goto :end short-circuits it).
-echo Fixing .env line endings and generating encryption key...
-docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "cd /var/www/html && sed -i 's/\r$//' .env && grep -q '^APP_KEY=.' .env 2>/dev/null || (php artisan key:generate --force --no-interaction && php artisan config:clear)" >nul 2>&1
+:env_ready
+REM Generate APP_KEY using PHP built-ins (random_bytes + base64_encode).
+REM php artisan key:generate cannot be used: it boots Laravel which throws the
+REM same "no key" exception before the command can set one -- a catch-22.
+REM PHP built-ins need nothing beyond the PHP binary itself (no vendor, no artisan).
+echo Generating encryption key...
+docker compose -f "%COMPOSE_FILE%" exec -T app php -r "$e=file_get_contents('/var/www/html/.env');if(preg_match('/^APP_KEY=\S/m',$e))exit;$k='base64:'.base64_encode(random_bytes(32));$e=preg_match('/^APP_KEY=/m',$e)?preg_replace('/^APP_KEY=.*/m','APP_KEY='.$k,$e):$e.chr(10).'APP_KEY='.$k;file_put_contents('/var/www/html/.env',$e);" 2>nul
 
 :after_key
 echo Waiting for app endpoint to become ready...

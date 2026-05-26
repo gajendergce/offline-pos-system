@@ -174,7 +174,14 @@ chmod -R ug+rwX storage bootstrap/cache
 chmod -R 777 storage
 
 if grep -q "^APP_KEY=$" .env 2>/dev/null || ! grep -q "^APP_KEY=" .env 2>/dev/null; then
-  php artisan key:generate --force --no-interaction
+  _key="base64:$(php -r 'echo base64_encode(random_bytes(32));' 2>/dev/null)"
+  if [ -n "$_key" ] && [ "$_key" != "base64:" ]; then
+    if grep -q "^APP_KEY=" .env; then
+      sed -i "s|^APP_KEY=.*|APP_KEY=${_key}|" .env
+    else
+      printf '\nAPP_KEY=%s\n' "$_key" >> .env
+    fi
+  fi
 fi
 
 php artisan optimize:clear
@@ -199,11 +206,8 @@ for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
   status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
   if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
     echo "Ensuring encryption key is set..."
-    docker compose -f "$COMPOSE_FILE" exec -T app sh -c \
-      "sed -i 's/\r\$//' /var/www/html/.env
-       if grep -q '^APP_KEY=\$' /var/www/html/.env 2>/dev/null || ! grep -q '^APP_KEY=' /var/www/html/.env 2>/dev/null; then
-         php artisan key:generate --force --no-interaction && php artisan config:clear
-       fi" \
+    docker compose -f "$COMPOSE_FILE" exec -T app php -r \
+      "\$e=file_get_contents('/var/www/html/.env');if(preg_match('/^APP_KEY=\S/m',\$e))exit;\$k='base64:'.base64_encode(random_bytes(32));\$e=preg_match('/^APP_KEY=/m',\$e)?preg_replace('/^APP_KEY=.*/m','APP_KEY='.\$k,\$e):\$e.chr(10).'APP_KEY='.\$k;file_put_contents('/var/www/html/.env',\$e);" \
       >/dev/null 2>&1 || true
     echo "Setup complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
     echo "Tip: code sync runs once on first startup and skips on container restarts by default."

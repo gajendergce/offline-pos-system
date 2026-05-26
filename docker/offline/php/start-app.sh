@@ -204,8 +204,25 @@ chown -R www-data:www-data storage bootstrap/cache \
                             /var/www/html/pos/storage /var/www/html/pos/bootstrap/cache
 chmod -R 777 storage /var/www/html/pos/storage
 
+# Generate APP_KEY using PHP built-ins before composer install.
+# php artisan key:generate cannot be used here because it boots Laravel, which
+# throws the same "no key" exception before the generate command can set one.
+# random_bytes() and base64_encode() are PHP core — no vendor or artisan needed.
+if grep -q "^APP_KEY=$" .env 2>/dev/null || ! grep -q "^APP_KEY=" .env 2>/dev/null; then
+  _key="base64:$(php -r 'echo base64_encode(random_bytes(32));' 2>/dev/null)"
+  if [ -n "$_key" ] && [ "$_key" != "base64:" ]; then
+    if grep -q "^APP_KEY=" .env; then
+      sed -i "s|^APP_KEY=.*|APP_KEY=${_key}|" .env
+    else
+      printf '\nAPP_KEY=%s\n' "$_key" >> .env
+    fi
+    echo "APP_KEY generated."
+  fi
+fi
+
 composer install --no-interaction --prefer-dist --optimize-autoloader
 
+# Fallback: artisan key:generate now that vendor/ exists (handles any edge case above).
 if grep -q "^APP_KEY=$" .env 2>/dev/null || ! grep -q "^APP_KEY=" .env 2>/dev/null; then
   php artisan key:generate --force --no-interaction
 fi
