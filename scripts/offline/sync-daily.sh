@@ -20,7 +20,7 @@ COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT/docker-compose.github.yml}"
 APP_ZIP_URL="${APP_ZIP_URL:-https://taxnomist.busywizzy.com/pos_APP_VERSION.zip}"
 APP_VERSION_URL="${APP_VERSION_URL:-}"
 APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
-OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
+OFFLINE_STORE_ID="${POS_OFFLINE_SYNC_STORE_ID:-${OFFLINE_STORE_ID:-}}"
 OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
 OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-${POS_OFFLINE_SYNC_SOURCE_URL:-}}"
 SYNC_SERVICES="${SYNC_SERVICES:-app queue scheduler}"
@@ -119,7 +119,7 @@ fi
 usage() {
   echo "Usage: APP_VERSION_URL=<url> [APP_ZIP_URL=<zip>] $0"
   echo "   or: APP_TARGET_VERSION=<version> [APP_ZIP_URL=<zip>] $0"
-  echo "Config can be stored in .env.offline (OFFLINE_STORE_ID, OFFLINE_TOKEN, APP_VERSION_URL, APP_ZIP_URL)."
+  echo "Config can be stored in .env.offline (POS_OFFLINE_SYNC_STORE_ID, POS_OFFLINE_SYNC_TOKEN, APP_VERSION_URL, APP_ZIP_URL)."
 }
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -140,7 +140,7 @@ fetch_target_version() {
   fi
 
   if [[ -z "$OFFLINE_STORE_ID" || -z "$OFFLINE_TOKEN" ]]; then
-    echo "Error: OFFLINE_STORE_ID and OFFLINE_TOKEN are required for API version fetch." >&2
+    echo "Error: POS_OFFLINE_SYNC_STORE_ID and POS_OFFLINE_SYNC_TOKEN are required for API version fetch." >&2
     return 1
   fi
 

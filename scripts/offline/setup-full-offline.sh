@@ -23,7 +23,7 @@ fi
 
 APP_ZIP_URL="${APP_ZIP_URL_INPUT:-${APP_ZIP_URL:-}}"
 APP_VERSION_URL="${APP_VERSION_URL:-https://agretail.ddev.site/api/offline/version}"
-OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
+OFFLINE_STORE_ID="${POS_OFFLINE_SYNC_STORE_ID:-${OFFLINE_STORE_ID:-}}"
 OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
 OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-${POS_OFFLINE_SYNC_SOURCE_URL:-}}"
 
@@ -60,7 +60,7 @@ set_kv() {
 }
 
 set_kv POS_OFFLINE_MODE true
-set_kv OFFLINE_STORE_ID "$store_id"
+set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
 set_kv OFFLINE_TOKEN "$token"
 set_kv OFFLINE_API_BASE_URL "$base_url"
 set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
@@ -77,6 +77,7 @@ fetch_target_version() {
   fi
 
   payload="$(printf '{"store_id": %s, "offline_token":"%s"}' "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN")"
+
   response="$(curl -fsSL --request GET "$APP_VERSION_URL" --header 'Content-Type: application/json' --data "$payload" || true)"
   if [[ -z "$response" ]]; then
     return 1
@@ -102,7 +103,7 @@ fetch_target_version() {
 if [[ "$APP_ZIP_URL" == *APP_VERSION* ]] && [[ -z "$APP_VERSION_URL" ]]; then
   resolved_version="$(fetch_target_version || true)"
   if [[ -z "$resolved_version" ]]; then
-    echo "Error: could not resolve app version from API. Check OFFLINE_STORE_ID/OFFLINE_TOKEN/APP_VERSION_URL."
+    echo "Error: could not resolve app version from API. Check POS_OFFLINE_SYNC_STORE_ID/POS_OFFLINE_SYNC_TOKEN/APP_VERSION_URL."
     exit 1
   fi
   APP_ZIP_URL="${APP_ZIP_URL//APP_VERSION/$resolved_version}"

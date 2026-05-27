@@ -29,8 +29,8 @@ for /f "usebackq delims=" %%L in (`powershell -NoProfile -Command "Get-Content -
   )
 )
 
-if not defined OFFLINE_STORE_ID (
-  echo Error: OFFLINE_STORE_ID is required in .env.offline
+if not defined POS_OFFLINE_SYNC_STORE_ID (
+  echo Error: POS_OFFLINE_SYNC_STORE_ID is required in .env.offline
   goto :end
 )
 if not defined OFFLINE_TOKEN (
@@ -61,7 +61,7 @@ REM ── Fetch target version from API ─────────────
 echo Fetching latest app version from API...
 set "_BODY_TMP=%TEMP%\pos_body_%RANDOM%.json"
 set "_VER_TMP=%TEMP%\pos_ver_%RANDOM%.json"
-powershell -NoProfile -Command "$body = ConvertTo-Json @{store_id = [int]%OFFLINE_STORE_ID%; offline_token = '%OFFLINE_TOKEN%'; current_version = '!OLD_VERSION!'}; [IO.File]::WriteAllText('%_BODY_TMP%', $body)"
+powershell -NoProfile -Command "$body = ConvertTo-Json @{store_id = [int]%POS_OFFLINE_SYNC_STORE_ID%; offline_token = '%POS_OFFLINE_SYNC_TOKEN%'; current_version = '!OLD_VERSION!'}; [IO.File]::WriteAllText('%_BODY_TMP%', $body)"
 curl.exe -s --ssl-no-revoke --location --request GET "%APP_VERSION_URL%" --header "Content-Type: application/json" --data @"%_BODY_TMP%" --output "%_VER_TMP%"
 del "%_BODY_TMP%" >nul 2>&1
 
@@ -74,7 +74,7 @@ del "%_VER_TMP%" >nul 2>&1
 
 if not defined NEW_VERSION (
   echo Error: could not parse POS_OFFLINE_BUNDLE_APP_VERSION from API response.
-  echo Check APP_VERSION_URL, OFFLINE_STORE_ID and OFFLINE_TOKEN in .env.offline.
+  echo Check APP_VERSION_URL, POS_OFFLINE_SYNC_STORE_ID and POS_OFFLINE_SYNC_TOKEN in .env.offline.
   goto :end
 )
 echo New version from API: %NEW_VERSION%

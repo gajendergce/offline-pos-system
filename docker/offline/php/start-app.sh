@@ -9,9 +9,9 @@ APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 VERSION_MARKER_FILE="${APP_VERSION_MARKER_FILE:-/var/www/html/.zip_sync_version}"
 APP_ENABLE_VERSION_SYNC_ON_START="${APP_ENABLE_VERSION_SYNC_ON_START:-}"
 DB_SETUP_MODE="${DB_SETUP_MODE:-structure}"
-# Credentials for the version API — fall back through several common env var names.
-OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-${POS_OFFLINE_SYNC_STORE_ID:-}}"
-OFFLINE_TOKEN="${OFFLINE_TOKEN:-${POS_OFFLINE_SYNC_TOKEN:-}}"
+# Credentials for the version API — POS_OFFLINE_SYNC_* is the primary name.
+OFFLINE_STORE_ID="${POS_OFFLINE_SYNC_STORE_ID:-${OFFLINE_STORE_ID:-}}"
+OFFLINE_TOKEN="${POS_OFFLINE_SYNC_TOKEN:-${OFFLINE_TOKEN:-}}"
 
 cd /var/www/html
 
@@ -23,10 +23,10 @@ if [ -f .env ]; then
   _env_val() { grep "^${1}=" .env 2>/dev/null | head -n1 | cut -d= -f2- | sed 's/[[:space:]]*$//'; }
   [ -z "$APP_VERSION_URL" ]  && APP_VERSION_URL="$(_env_val APP_VERSION_URL)"
   [ -z "$APP_ZIP_URL" ]      && APP_ZIP_URL="$(_env_val APP_ZIP_URL)"
-  [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val OFFLINE_STORE_ID)"
-  [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val OFFLINE_TOKEN)"
   [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val POS_OFFLINE_SYNC_STORE_ID)"
   [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val POS_OFFLINE_SYNC_TOKEN)"
+  [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val OFFLINE_STORE_ID)"
+  [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val OFFLINE_TOKEN)"
 fi
 
 if [ -z "$APP_ZIP_URL" ]; then
@@ -246,7 +246,7 @@ set_env_value "QUEUE_CONNECTION"  "${QUEUE_CONNECTION:-database}"
 # Persist version-sync config so it survives plain container restarts where
 # Docker env vars are not re-injected from the host shell.
 [ -n "${APP_VERSION_URL:-}" ]             && set_env_value "APP_VERSION_URL"             "$APP_VERSION_URL"
-[ -n "${OFFLINE_STORE_ID:-}" ]            && set_env_value "OFFLINE_STORE_ID"            "$OFFLINE_STORE_ID"
+[ -n "${OFFLINE_STORE_ID:-}" ]            && set_env_value "POS_OFFLINE_SYNC_STORE_ID"   "$OFFLINE_STORE_ID"
 [ -n "${OFFLINE_TOKEN:-}" ]               && set_env_value "OFFLINE_TOKEN"               "$OFFLINE_TOKEN"
 # Always write the ZIP URL template (with APP_VERSION placeholder) not a
 # resolved URL, so that version substitution works on the next version bump.
