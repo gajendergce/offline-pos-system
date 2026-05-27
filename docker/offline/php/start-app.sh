@@ -77,11 +77,13 @@ download_and_extract_zip() {
 }
 
 FETCHED_ZIP_URL=""
+FETCHED_VERSION=""
 
 fetch_target_version() {
   FETCHED_ZIP_URL=""
+  FETCHED_VERSION=""
   if [ -n "$APP_TARGET_VERSION" ]; then
-    printf "%s" "$APP_TARGET_VERSION"
+    FETCHED_VERSION="$APP_TARGET_VERSION"
     return 0
   fi
 
@@ -102,7 +104,7 @@ fetch_target_version() {
   compact="$(printf "%s" "$response" | tr -d '\r\n')"
 
   # Extract ZIP URL from API response.
-  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/\\\//\//g')"
 
   parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
 
@@ -111,14 +113,15 @@ fetch_target_version() {
   fi
 
   if [ -n "$parsed" ]; then
-    printf "%s" "$parsed"
+    FETCHED_VERSION="$parsed"
   else
-    printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    FETCHED_VERSION="$(printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
   fi
 }
 
 sync_from_version_if_needed() {
-  target_version="$(fetch_target_version)"
+  fetch_target_version
+  target_version="$FETCHED_VERSION"
   if [ -z "$target_version" ]; then
     return 1
   fi

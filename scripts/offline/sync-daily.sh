@@ -135,11 +135,13 @@ if [[ -z "$APP_TARGET_VERSION" && -z "$APP_VERSION_URL" ]]; then
 fi
 
 FETCHED_ZIP_URL=""
+FETCHED_VERSION=""
 
 fetch_target_version() {
   FETCHED_ZIP_URL=""
+  FETCHED_VERSION=""
   if [[ -n "$APP_TARGET_VERSION" ]]; then
-    printf "%s" "$APP_TARGET_VERSION"
+    FETCHED_VERSION="$APP_TARGET_VERSION"
     return 0
   fi
 
@@ -158,7 +160,7 @@ fetch_target_version() {
   compact="$(printf "%s" "$response" | tr -d '\r\n')"
 
   # Extract ZIP URL from API response.
-  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/\\\//\//g')"
 
   parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
 
@@ -167,9 +169,9 @@ fetch_target_version() {
   fi
 
   if [[ -n "$parsed" ]]; then
-    printf "%s" "$parsed"
+    FETCHED_VERSION="$parsed"
   else
-    printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    FETCHED_VERSION="$(printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
   fi
 }
 
@@ -181,13 +183,12 @@ old_version="$(docker compose -f "$COMPOSE_FILE" exec -T app sh -lc 'cat /var/ww
 old_version="$(printf "%s" "$old_version" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
 echo "Current installed version: ${old_version:-none}"
 
-new_version="$(fetch_target_version || true)"
+fetch_target_version || true
+new_version="$(printf "%s" "$FETCHED_VERSION" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
 if [[ -z "$new_version" ]]; then
   echo "Error: could not resolve target version from APP_VERSION_URL/APP_TARGET_VERSION."
   exit 1
 fi
-
-new_version="$(printf "%s" "$new_version" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
 echo "New version from API: $new_version"
 
 if [[ "$old_version" == "$new_version" ]]; then
