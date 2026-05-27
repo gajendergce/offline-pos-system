@@ -144,7 +144,7 @@ fetch_target_version() {
     return 1
   fi
 
-  payload="$(printf '{"store_id": %s, "offline_token":"%s"}' "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN")"
+  payload="$(printf '{"store_id": %s, "offline_token":"%s", "current_version":"%s"}' "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN" "${old_version:-}")"
 
   response="$(curl -fsSL --request GET "$APP_VERSION_URL" --header 'Content-Type: application/json' --data "$payload" || true)"
   if [[ -z "$response" ]]; then
@@ -167,6 +167,12 @@ fetch_target_version() {
 
 cd "$PROJECT_ROOT"
 
+# Read current installed version before hitting the API so it can be sent
+# as current_version in the request payload.
+old_version="$(docker compose -f "$COMPOSE_FILE" exec -T app sh -lc 'cat /var/www/html/.zip_sync_version 2>/dev/null || true' 2>/dev/null || true)"
+old_version="$(printf "%s" "$old_version" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+echo "Current installed version: ${old_version:-none}"
+
 new_version="$(fetch_target_version || true)"
 if [[ -z "$new_version" ]]; then
   echo "Error: could not resolve target version from APP_VERSION_URL/APP_TARGET_VERSION."
@@ -174,11 +180,7 @@ if [[ -z "$new_version" ]]; then
 fi
 
 new_version="$(printf "%s" "$new_version" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-echo "New version from API/input: $new_version"
-
-old_version="$(docker compose -f "$COMPOSE_FILE" exec -T app sh -lc 'cat /var/www/html/.zip_sync_version 2>/dev/null || true' || true)"
-old_version="$(printf "%s" "$old_version" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
-echo "Old version from local marker: ${old_version:-none}"
+echo "New version from API: $new_version"
 
 if [[ "$old_version" == "$new_version" ]]; then
   echo "Version matches ($new_version). No code pull needed."

@@ -78,7 +78,9 @@ fetch_target_version() {
     return 0
   fi
 
-  _payload="{\"store_id\": ${OFFLINE_STORE_ID:-0}, \"offline_token\": \"${OFFLINE_TOKEN:-}\"}"
+  _current_version=""
+  [ -f "$VERSION_MARKER_FILE" ] && _current_version="$(cat "$VERSION_MARKER_FILE" 2>/dev/null | tr -d '\r\n' || true)"
+  _payload="{\"store_id\": ${OFFLINE_STORE_ID:-0}, \"offline_token\": \"${OFFLINE_TOKEN:-}\", \"current_version\": \"${_current_version}\"}"
   response="$(curl -fsSL --request GET "$APP_VERSION_URL" \
     --header 'Content-Type: application/json' \
     --data "$_payload" || true)"

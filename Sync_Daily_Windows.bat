@@ -47,11 +47,21 @@ echo Daily sync starting...
 echo Version API : %APP_VERSION_URL%
 echo ZIP template: %APP_ZIP_URL%
 
+REM ── Read current version from container marker file first ──────────────────
+REM Sent to the API as current_version so the server knows what is installed.
+set "OLD_VERSION="
+for /f "usebackq delims=" %%V in (`docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "cat /var/www/html/.zip_sync_version 2>/dev/null || true" 2^>nul`) do set "OLD_VERSION=%%V"
+if defined OLD_VERSION (
+  for /f "tokens=* delims=" %%V in ("!OLD_VERSION!") do set "OLD_VERSION=%%V"
+)
+if not defined OLD_VERSION set "OLD_VERSION="
+echo Current installed version: !OLD_VERSION!
+
 REM ── Fetch target version from API ──────────────────────────────────────────
 echo Fetching latest app version from API...
 set "_BODY_TMP=%TEMP%\pos_body_%RANDOM%.json"
 set "_VER_TMP=%TEMP%\pos_ver_%RANDOM%.json"
-powershell -NoProfile -Command "$body = ConvertTo-Json @{store_id = [int]%OFFLINE_STORE_ID%; offline_token = '%OFFLINE_TOKEN%'}; [IO.File]::WriteAllText('%_BODY_TMP%', $body)"
+powershell -NoProfile -Command "$body = ConvertTo-Json @{store_id = [int]%OFFLINE_STORE_ID%; offline_token = '%OFFLINE_TOKEN%'; current_version = '!OLD_VERSION!'}; [IO.File]::WriteAllText('%_BODY_TMP%', $body)"
 curl.exe -s --ssl-no-revoke --location --request GET "%APP_VERSION_URL%" --header "Content-Type: application/json" --data @"%_BODY_TMP%" --output "%_VER_TMP%"
 del "%_BODY_TMP%" >nul 2>&1
 
@@ -68,16 +78,6 @@ if not defined NEW_VERSION (
   goto :end
 )
 echo New version from API: %NEW_VERSION%
-
-REM ── Read current version from container marker file ─────────────────────────
-set "OLD_VERSION="
-for /f "usebackq delims=" %%V in (`docker compose -f "%COMPOSE_FILE%" exec -T app sh -c "cat /var/www/html/.zip_sync_version 2>/dev/null || true" 2^>nul`) do set "OLD_VERSION=%%V"
-REM Strip any stray CR from the marker value
-if defined OLD_VERSION (
-  for /f "tokens=* delims=" %%V in ("!OLD_VERSION!") do set "OLD_VERSION=%%V"
-)
-if not defined OLD_VERSION set "OLD_VERSION=(none)"
-echo Current installed version: !OLD_VERSION!
 
 REM ── Compare versions ────────────────────────────────────────────────────────
 if "!OLD_VERSION!"=="%NEW_VERSION%" (
