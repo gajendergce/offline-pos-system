@@ -17,17 +17,18 @@ if [[ -f "$OFFLINE_ENV_FILE" ]]; then
 fi
 
 COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT/docker-compose.github.yml}"
-APP_ZIP_URL="${APP_ZIP_URL:-https://taxnomist.busywizzy.com/pos_APP_VERSION.zip}"
+APP_ZIP_URL="${APP_ZIP_URL:-}"
 APP_VERSION_URL="${APP_VERSION_URL:-}"
 APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 OFFLINE_STORE_ID="${POS_OFFLINE_SYNC_STORE_ID:-${OFFLINE_STORE_ID:-}}"
-OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
-OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-${POS_OFFLINE_SYNC_SOURCE_URL:-}}"
+OFFLINE_TOKEN="${POS_OFFLINE_SYNC_TOKEN:-${OFFLINE_TOKEN:-}}"
+OFFLINE_API_BASE_URL="${POS_OFFLINE_SYNC_SOURCE_URL:-${OFFLINE_API_BASE_URL:-}}"
 SYNC_SERVICES="${SYNC_SERVICES:-app queue scheduler}"
 READY_CHECK_ATTEMPTS="${READY_CHECK_ATTEMPTS:-300}"
 
-if [[ -z "$OFFLINE_API_BASE_URL" && -n "$APP_VERSION_URL" ]]; then
-  OFFLINE_API_BASE_URL="$(printf '%s' "$APP_VERSION_URL" | sed 's#/api/offline/version/?$##')"
+# Derive APP_VERSION_URL from POS_OFFLINE_SYNC_SOURCE_URL when not explicitly set.
+if [[ -z "$APP_VERSION_URL" && -n "$OFFLINE_API_BASE_URL" ]]; then
+  APP_VERSION_URL="$(printf '%s' "$OFFLINE_API_BASE_URL" | sed 's|/*$||')/api/offline/version"
 fi
 
 sync_offline_env_into_app_env() {
@@ -133,7 +134,10 @@ if [[ -z "$APP_TARGET_VERSION" && -z "$APP_VERSION_URL" ]]; then
   exit 1
 fi
 
+FETCHED_ZIP_URL=""
+
 fetch_target_version() {
+  FETCHED_ZIP_URL=""
   if [[ -n "$APP_TARGET_VERSION" ]]; then
     printf "%s" "$APP_TARGET_VERSION"
     return 0
@@ -152,6 +156,10 @@ fetch_target_version() {
   fi
 
   compact="$(printf "%s" "$response" | tr -d '\r\n')"
+
+  # Extract ZIP URL from API response.
+  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+
   parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
 
   if [[ -z "$parsed" ]]; then
@@ -192,9 +200,15 @@ fi
 
 echo "Version mismatch (${old_version:-none} -> $new_version). Forcing full code sync from ZIP..."
 
-resolved_zip_url="$APP_ZIP_URL"
-if [[ "$resolved_zip_url" == *APP_VERSION* ]]; then
-  resolved_zip_url="${resolved_zip_url//APP_VERSION/$new_version}"
+# Prefer ZIP URL from API response; fall back to template substitution.
+resolved_zip_url="${FETCHED_ZIP_URL:-}"
+if [[ -z "$resolved_zip_url" && -n "$APP_ZIP_URL" ]]; then
+  resolved_zip_url="${APP_ZIP_URL//APP_VERSION/$new_version}"
+fi
+
+if [[ -z "$resolved_zip_url" ]]; then
+  echo "Error: no ZIP URL available. API response must include APP_ZIP_URL or set APP_ZIP_URL in .env.offline."
+  exit 1
 fi
 
 echo "Using ZIP URL: $resolved_zip_url"

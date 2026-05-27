@@ -33,19 +33,22 @@ if not defined POS_OFFLINE_SYNC_STORE_ID (
   echo Error: POS_OFFLINE_SYNC_STORE_ID is required in .env.offline
   goto :end
 )
-if not defined OFFLINE_TOKEN (
-  echo Error: OFFLINE_TOKEN is required in .env.offline
+if not defined POS_OFFLINE_SYNC_TOKEN (
+  echo Error: POS_OFFLINE_SYNC_TOKEN is required in .env.offline
   goto :end
 )
+if not defined POS_OFFLINE_SYNC_SOURCE_URL (
+  echo Error: POS_OFFLINE_SYNC_SOURCE_URL is required in .env.offline
+  goto :end
+)
+
+REM Auto-derive APP_VERSION_URL from POS_OFFLINE_SYNC_SOURCE_URL + /api/offline/version.
 if not defined APP_VERSION_URL (
-  echo Error: APP_VERSION_URL is required in .env.offline
-  goto :end
+  for /f "usebackq delims=" %%U in (`powershell -NoProfile -Command "'%POS_OFFLINE_SYNC_SOURCE_URL%'.TrimEnd('/') + '/api/offline/version'"`) do set "APP_VERSION_URL=%%U"
 )
-if not defined APP_ZIP_URL set "APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip"
 
 echo Daily sync starting...
 echo Version API : %APP_VERSION_URL%
-echo ZIP template: %APP_ZIP_URL%
 
 REM ── Read current version from container marker file first ──────────────────
 REM Sent to the API as current_version so the server knows what is installed.
@@ -69,11 +72,14 @@ if not exist "%_VER_TMP%" (
   echo Error: API request failed. Check network and APP_VERSION_URL in .env.offline.
   goto :end
 )
-for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "(Get-Content -LiteralPath '%_VER_TMP%' -Raw | ConvertFrom-Json).POS_OFFLINE_BUNDLE_APP_VERSION.Trim()"`) do set "NEW_VERSION=%%V"
+set "NEW_VERSION="
+set "FETCHED_ZIP_URL="
+for /f "usebackq delims=" %%V in (`powershell -NoProfile -Command "$j=Get-Content -LiteralPath '%_VER_TMP%' -Raw|ConvertFrom-Json; if($j.POS_OFFLINE_BUNDLE_APP_VERSION){$j.POS_OFFLINE_BUNDLE_APP_VERSION.Trim()}elseif($j.version){$j.version.Trim()}else{''}"`) do set "NEW_VERSION=%%V"
+for /f "usebackq delims=" %%Z in (`powershell -NoProfile -Command "$j=Get-Content -LiteralPath '%_VER_TMP%' -Raw|ConvertFrom-Json; if($j.POS_OFFLINE_ZIP_URL){$j.POS_OFFLINE_ZIP_URL.Trim()}else{''}"`) do set "FETCHED_ZIP_URL=%%Z"
 del "%_VER_TMP%" >nul 2>&1
 
 if not defined NEW_VERSION (
-  echo Error: could not parse POS_OFFLINE_BUNDLE_APP_VERSION from API response.
+  echo Error: could not parse version from API response.
   echo Check APP_VERSION_URL, POS_OFFLINE_SYNC_STORE_ID and POS_OFFLINE_SYNC_TOKEN in .env.offline.
   goto :end
 )
@@ -91,7 +97,17 @@ if "!OLD_VERSION!"=="%NEW_VERSION%" (
 echo Version mismatch ^(!OLD_VERSION! -^> %NEW_VERSION%^). Downloading new ZIP...
 
 REM ── Resolve ZIP URL ─────────────────────────────────────────────────────────
-set "RESOLVED_ZIP=!APP_ZIP_URL:APP_VERSION=%NEW_VERSION%!"
+REM Prefer URL returned by the API; fall back to template substitution.
+set "RESOLVED_ZIP=!FETCHED_ZIP_URL!"
+if "!RESOLVED_ZIP!"=="" (
+  if defined APP_ZIP_URL (
+    set "RESOLVED_ZIP=!APP_ZIP_URL:APP_VERSION=%NEW_VERSION%!"
+  )
+)
+if "!RESOLVED_ZIP!"=="" (
+  echo Error: no ZIP URL from API response and APP_ZIP_URL not set in .env.offline.
+  goto :end
+)
 echo Using ZIP URL: !RESOLVED_ZIP!
 
 REM ── Force-recreate app services with new version ────────────────────────────
