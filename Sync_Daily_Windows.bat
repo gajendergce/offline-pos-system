@@ -110,6 +110,18 @@ if "!RESOLVED_ZIP!"=="" (
 )
 echo Using ZIP URL: !RESOLVED_ZIP!
 
+REM ── Check ZIP availability ───────────────────────────────────────────────────
+echo Checking ZIP availability...
+for /f "usebackq delims=" %%C in (`curl.exe -s -o nul -w "%%{http_code}" --head --ssl-no-revoke "!RESOLVED_ZIP!" 2^>nul`) do set "_ZIP_HTTP=%%C"
+if "!_ZIP_HTTP!"=="200" goto :zip_ok
+if "!_ZIP_HTTP!"=="206" goto :zip_ok
+if "!_ZIP_HTTP!"=="301" goto :zip_ok
+if "!_ZIP_HTTP!"=="302" goto :zip_ok
+echo Error: ZIP not reachable at !RESOLVED_ZIP! ^(HTTP !_ZIP_HTTP!^). Aborting sync.
+goto :end
+:zip_ok
+echo ZIP is available ^(HTTP !_ZIP_HTTP!^).
+
 REM ── Force-recreate app services with new version ────────────────────────────
 REM APP_ENABLE_VERSION_SYNC_ON_START=0 tells start-app.sh to use the URL we
 REM provide directly instead of re-calling the version API itself.
