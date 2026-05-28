@@ -73,9 +73,11 @@ set_kv APP_ZIP_URL "$zip_url"
 }
 
 FETCHED_ZIP_URL=""
+FETCHED_VERSION=""
 
 fetch_target_version() {
   FETCHED_ZIP_URL=""
+  FETCHED_VERSION=""
   if [[ -z "$OFFLINE_STORE_ID" || -z "$OFFLINE_TOKEN" ]]; then
     return 1
   fi
@@ -99,9 +101,9 @@ fetch_target_version() {
   fi
 
   if [[ -n "$parsed" ]]; then
-    printf "%s" "$parsed"
+    FETCHED_VERSION="$parsed"
   else
-    printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    FETCHED_VERSION="$(printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
   fi
 }
 
@@ -134,6 +136,19 @@ if ! command -v docker >/dev/null 2>&1; then
   echo "Error: docker is not installed or not in PATH."
   exit 1
 fi
+
+if [[ -z "$APP_ZIP_URL" ]]; then
+  echo "Error: ZIP URL could not be resolved. Set APP_ZIP_URL in .env.offline or ensure the version API returns POS_OFFLINE_ZIP_URL."
+  exit 1
+fi
+
+echo "Checking ZIP availability at $APP_ZIP_URL ..."
+_zip_http="$(curl -s -o /dev/null -w "%{http_code}" --head "$APP_ZIP_URL" || true)"
+if [[ "$_zip_http" != "200" && "$_zip_http" != "206" && "$_zip_http" != "301" && "$_zip_http" != "302" ]]; then
+  echo "Error: ZIP not reachable at $APP_ZIP_URL (HTTP ${_zip_http:-000}). Check the URL and your network."
+  exit 1
+fi
+echo "ZIP is available (HTTP $_zip_http)."
 
 echo "Starting full offline setup..."
 echo "Project root: $PROJECT_ROOT"
@@ -209,6 +224,22 @@ fi
 
 echo "Syncing .env.offline values into app .env..."
 sync_offline_env_into_app_env
+
+# Stamp the installed version so sync-daily.sh can detect future updates.
+if [[ -n "$FETCHED_VERSION" ]]; then
+  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
+cd /var/www/html
+if [ -f .env ]; then
+  if grep -q '^POS_OFFLINE_BUNDLE_APP_VERSION=' .env; then
+    sed -i 's|^POS_OFFLINE_BUNDLE_APP_VERSION=.*|POS_OFFLINE_BUNDLE_APP_VERSION=${FETCHED_VERSION}|' .env
+  else
+    echo 'POS_OFFLINE_BUNDLE_APP_VERSION=${FETCHED_VERSION}' >> .env
+  fi
+fi
+printf '%s' '${FETCHED_VERSION}' > .zip_sync_version
+"
+  echo "Stamped installed version (${FETCHED_VERSION}) into .env and .zip_sync_version"
+fi
 
 echo "Waiting for app endpoint to become ready..."
 for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do

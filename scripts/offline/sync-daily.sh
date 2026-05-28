@@ -214,6 +214,14 @@ fi
 
 echo "Using ZIP URL: $resolved_zip_url"
 
+echo "Checking ZIP availability..."
+_zip_http="$(curl -s -o /dev/null -w "%{http_code}" --head "$resolved_zip_url" || true)"
+if [[ "$_zip_http" != "200" && "$_zip_http" != "206" && "$_zip_http" != "301" && "$_zip_http" != "302" ]]; then
+  echo "Error: ZIP not reachable at $resolved_zip_url (HTTP ${_zip_http:-000}). Aborting sync."
+  exit 1
+fi
+echo "ZIP is available (HTTP $_zip_http)."
+
 APP_ZIP_URL="$resolved_zip_url" \
 APP_TARGET_VERSION="$new_version" \
 APP_SYNC_ZIP_ON_START=always \
