@@ -1,15 +1,6 @@
-# OFFLINE_STORE_ID=39
-# OFFLINE_TOKEN=7QHP5aPCuae5cy2xFQlAvMrjR0NoQqlS
-
-OFFLINE_STORE_ID=84
-OFFLINE_TOKEN=bxJoJyRpg6HhnP7ZnsNMp64R6tYV2k75
-# API endpoint returning bundle version
-# APP_VERSION_URL=https://agretail.ddev.site/api/offline/version
-APP_VERSION_URL=https://qa.agretail.com/develop/public/api/offline/version
-# ZIP template; APP_VERSION placeholder is replaced by resolved version
-APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_APP_VERSION.zip
-OFFLINE_API_BASE_URL=https://qa.agretail.com/develop/public/
+POS_OFFLINE_SYNC_STORE_ID=
+POS_OFFLINE_SYNC_TOKEN=
+# APP_VERSION_URL is derived automatically: POS_OFFLINE_SYNC_SOURCE_URL + api/offline/version
+# APP_ZIP_URL is returned by the version API response
 POS_OFFLINE_MODE=true
-POS_OFFLINE_SYNC_STORE_ID=84
-POS_OFFLINE_SYNC_SOURCE_URL=https://qa.agretail.com/develop/public/
-POS_OFFLINE_SYNC_TOKEN=bxJoJyRpg6HhnP7ZnsNMp64R6tYV2k75
+POS_OFFLINE_SYNC_SOURCE_URL=

@@ -22,13 +22,14 @@ if [[ -f "$OFFLINE_ENV_FILE" ]]; then
 fi
 
 APP_ZIP_URL="${APP_ZIP_URL_INPUT:-${APP_ZIP_URL:-}}"
-APP_VERSION_URL="${APP_VERSION_URL:-https://agretail.ddev.site/api/offline/version}"
-OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-}"
-OFFLINE_TOKEN="${OFFLINE_TOKEN:-}"
-OFFLINE_API_BASE_URL="${OFFLINE_API_BASE_URL:-${POS_OFFLINE_SYNC_SOURCE_URL:-}}"
+APP_VERSION_URL="${APP_VERSION_URL:-}"
+OFFLINE_STORE_ID="${POS_OFFLINE_SYNC_STORE_ID:-${OFFLINE_STORE_ID:-}}"
+OFFLINE_TOKEN="${POS_OFFLINE_SYNC_TOKEN:-${OFFLINE_TOKEN:-}}"
+OFFLINE_API_BASE_URL="${POS_OFFLINE_SYNC_SOURCE_URL:-${OFFLINE_API_BASE_URL:-}}"
 
-if [[ -z "$OFFLINE_API_BASE_URL" && -n "$APP_VERSION_URL" ]]; then
-  OFFLINE_API_BASE_URL="$(printf '%s' "$APP_VERSION_URL" | sed 's#/api/offline/version/?$##')"
+# Derive APP_VERSION_URL from POS_OFFLINE_SYNC_SOURCE_URL when not explicitly set.
+if [[ -z "$APP_VERSION_URL" && -n "$OFFLINE_API_BASE_URL" ]]; then
+  APP_VERSION_URL="$(printf '%s' "$OFFLINE_API_BASE_URL" | sed 's|/*$||')/api/offline/version"
 fi
 
 sync_offline_env_into_app_env() {
@@ -60,9 +61,9 @@ set_kv() {
 }
 
 set_kv POS_OFFLINE_MODE true
-set_kv OFFLINE_STORE_ID "$store_id"
+set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
 set_kv OFFLINE_TOKEN "$token"
-set_kv OFFLINE_API_BASE_URL "$base_url"
+set_kv POS_OFFLINE_SYNC_SOURCE_URL "$base_url"
 set_kv POS_OFFLINE_SYNC_STORE_ID "$store_id"
 set_kv POS_OFFLINE_SYNC_TOKEN "$token"
 set_kv POS_OFFLINE_SYNC_SOURCE_URL "$base_url"
@@ -71,18 +72,28 @@ set_kv APP_ZIP_URL "$zip_url"
 ' sh "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN" "$OFFLINE_API_BASE_URL" "$APP_VERSION_URL" "$APP_ZIP_URL"
 }
 
+FETCHED_ZIP_URL=""
+FETCHED_VERSION=""
+
 fetch_target_version() {
+  FETCHED_ZIP_URL=""
+  FETCHED_VERSION=""
   if [[ -z "$OFFLINE_STORE_ID" || -z "$OFFLINE_TOKEN" ]]; then
     return 1
   fi
 
   payload="$(printf '{"store_id": %s, "offline_token":"%s"}' "$OFFLINE_STORE_ID" "$OFFLINE_TOKEN")"
+
   response="$(curl -fsSL --request GET "$APP_VERSION_URL" --header 'Content-Type: application/json' --data "$payload" || true)"
   if [[ -z "$response" ]]; then
     return 1
   fi
 
   compact="$(printf "%s" "$response" | tr -d '\r\n')"
+
+  # Extract ZIP URL from API response.
+  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/\\\//\//g')"
+
   parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
 
   if [[ -z "$parsed" ]]; then
@@ -90,23 +101,19 @@ fetch_target_version() {
   fi
 
   if [[ -n "$parsed" ]]; then
-    printf "%s" "$parsed"
+    FETCHED_VERSION="$parsed"
   else
-    printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    FETCHED_VERSION="$(printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
   fi
 }
 
-# When APP_ZIP_URL contains APP_VERSION and APP_VERSION_URL is set, let the
-# container handle version resolution on every start so it can detect upgrades.
-# Only pre-resolve here when no version API is configured (direct URL given).
-if [[ "$APP_ZIP_URL" == *APP_VERSION* ]] && [[ -z "$APP_VERSION_URL" ]]; then
-  resolved_version="$(fetch_target_version || true)"
-  if [[ -z "$resolved_version" ]]; then
-    echo "Error: could not resolve app version from API. Check OFFLINE_STORE_ID/OFFLINE_TOKEN/APP_VERSION_URL."
-    exit 1
+# Fetch APP_ZIP_URL from the version API when not explicitly provided.
+if [[ -z "$APP_ZIP_URL" ]] && [[ -n "$APP_VERSION_URL" ]]; then
+  fetch_target_version > /dev/null || true
+  if [[ -n "$FETCHED_ZIP_URL" ]]; then
+    APP_ZIP_URL="$FETCHED_ZIP_URL"
+    echo "ZIP URL from API: $APP_ZIP_URL"
   fi
-  APP_ZIP_URL="${APP_ZIP_URL//APP_VERSION/$resolved_version}"
-  echo "Resolved version from API: $resolved_version"
 fi
 
 COMPOSE_FILE="${COMPOSE_FILE:-$PROJECT_ROOT/docker-compose.github.yml}"
@@ -129,6 +136,19 @@ if ! command -v docker >/dev/null 2>&1; then
   echo "Error: docker is not installed or not in PATH."
   exit 1
 fi
+
+if [[ -z "$APP_ZIP_URL" ]]; then
+  echo "Error: ZIP URL could not be resolved. Set APP_ZIP_URL in .env.offline or ensure the version API returns POS_OFFLINE_ZIP_URL."
+  exit 1
+fi
+
+echo "Checking ZIP availability at $APP_ZIP_URL ..."
+_zip_http="$(curl -s -o /dev/null -w "%{http_code}" --head "$APP_ZIP_URL" || true)"
+if [[ "$_zip_http" != "200" && "$_zip_http" != "206" && "$_zip_http" != "301" && "$_zip_http" != "302" ]]; then
+  echo "Error: ZIP not reachable at $APP_ZIP_URL (HTTP ${_zip_http:-000}). Check the URL and your network."
+  exit 1
+fi
+echo "ZIP is available (HTTP $_zip_http)."
 
 echo "Starting full offline setup..."
 echo "Project root: $PROJECT_ROOT"
@@ -178,7 +198,7 @@ chmod -R ug+rwX storage bootstrap/cache
 chmod -R 777 storage
 
 if grep -q "^APP_KEY=$" .env 2>/dev/null || ! grep -q "^APP_KEY=" .env 2>/dev/null; then
-  _key="base64:$(php -r 'echo base64_encode(random_bytes(32));' 2>/dev/null)"
+  _key="base64:$(php -r "echo base64_encode(random_bytes(32));" 2>/dev/null)"
   if [ -n "$_key" ] && [ "$_key" != "base64:" ]; then
     if grep -q "^APP_KEY=" .env; then
       sed -i "s|^APP_KEY=.*|APP_KEY=${_key}|" .env
@@ -204,6 +224,22 @@ fi
 
 echo "Syncing .env.offline values into app .env..."
 sync_offline_env_into_app_env
+
+# Stamp the installed version so sync-daily.sh can detect future updates.
+if [[ -n "$FETCHED_VERSION" ]]; then
+  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
+cd /var/www/html
+if [ -f .env ]; then
+  if grep -q '^POS_OFFLINE_BUNDLE_APP_VERSION=' .env; then
+    sed -i 's|^POS_OFFLINE_BUNDLE_APP_VERSION=.*|POS_OFFLINE_BUNDLE_APP_VERSION=${FETCHED_VERSION}|' .env
+  else
+    echo 'POS_OFFLINE_BUNDLE_APP_VERSION=${FETCHED_VERSION}' >> .env
+  fi
+fi
+printf '%s' '${FETCHED_VERSION}' > .zip_sync_version
+"
+  echo "Stamped installed version (${FETCHED_VERSION}) into .env and .zip_sync_version"
+fi
 
 echo "Waiting for app endpoint to become ready..."
 for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do

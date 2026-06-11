@@ -1,173 +1,204 @@
-# First Time Setup — Offline POS
+# First Time Setup — Offline POS (Windows)
 
-Step-by-step guide for setting up the Offline POS Docker stack on a brand new computer.
-
-Use the launcher for your operating system, or follow the manual steps at the end.
+Step-by-step guide for setting up the Offline POS Docker stack on a Windows computer for the first time.
 
 ---
 
 ## Step 1: Install Prerequisites
 
-Install these on the target computer before anything else:
+Install the following before anything else:
 
-1. **Docker Desktop** — download from [docker.com](https://www.docker.com/products/docker-desktop/) and make sure it is running (whale icon in the menu bar / system tray).
-2. **Git** (only if cloning the repo). On macOS/Linux it is usually preinstalled.
-3. **curl** and **unzip** — preinstalled on macOS/Linux; on Windows the launcher uses PowerShell instead.
+### Docker Desktop
+1. Download from [docker.com](https://www.docker.com/products/docker-desktop/)
+2. Run the installer and restart when prompted
+3. After restart, Docker Desktop should start automatically (whale icon in the system tray)
+4. Wait until Docker Desktop shows **"Engine running"**
 
-Verify Docker is working:
+### Git for Windows
+1. Download from [git-scm.com](https://git-scm.com/download/win)
+2. Run the installer with default options
 
-```bash
+Verify both are working — open **Command Prompt** and run:
+
+```cmd
 docker --version
 docker compose version
+git --version
 ```
 
 ---
 
 ## Step 2: Get the Project Files
 
-Either clone the repository or copy the `offline-pos-system` folder onto the new computer.
+Open **Command Prompt** and run:
 
-```bash
-git clone <this-repo-url>
+```cmd
+git clone https://github.com/gajendergce/offline-pos-system
 cd offline-pos-system
 ```
 
-After this you should see [docker-compose.github.yml](docker-compose.github.yml), [.env.offline](.env.offline), and the OS launcher files in the project root.
+Or double-click **[Pull_Repo_Windows.bat](Pull_Repo_Windows.bat)** — it will clone the repo automatically (requires `GIT_USERNAME` and `GIT_TOKEN` in `.env.offline`, see Step 3).
 
 ---
 
-## Step 3: Configure Store Credentials
+## Step 3: Create `.env.offline`
 
-Open [.env.offline](.env.offline) and set values for **this specific store**:
+Create a file named `.env.offline` in the project folder with the credentials for this store:
+
+```env
+POS_OFFLINE_SYNC_STORE_ID=<store id>
+POS_OFFLINE_SYNC_TOKEN=<auth token>
+POS_OFFLINE_SYNC_SOURCE_URL=https://<central-server>/public/
+POS_OFFLINE_MODE=true
+
+# GitHub repo credentials (used by Pull_Repo_Windows.bat)
+GIT_REPO_URL=https://github.com/gajendergce/offline-pos-system
+GIT_USERNAME=<github username>
+GIT_TOKEN=<github personal access token>
+```
 
 | Variable | Purpose |
 | --- | --- |
-| `OFFLINE_STORE_ID` | Store ID assigned by the central system |
-| `OFFLINE_TOKEN` | Auth token for this store |
-| `APP_VERSION_URL` | API endpoint that returns current app bundle version |
-| `APP_ZIP_URL` | ZIP URL template (keep the `APP_VERSION` placeholder) |
-| `OFFLINE_API_BASE_URL` | Base URL of the central API |
-| `POS_OFFLINE_SYNC_STORE_ID` | Same as `OFFLINE_STORE_ID` |
-| `POS_OFFLINE_SYNC_TOKEN` | Same as `OFFLINE_TOKEN` |
+| `POS_OFFLINE_SYNC_STORE_ID` | Store ID assigned by the central system |
+| `POS_OFFLINE_SYNC_TOKEN` | Auth token for this store |
+| `POS_OFFLINE_SYNC_SOURCE_URL` | Base URL of the central server |
+| `POS_OFFLINE_MODE` | Always `true` for offline stores |
+| `GIT_REPO_URL` | GitHub repository URL |
+| `GIT_USERNAME` | GitHub username for private repo access |
+| `GIT_TOKEN` | GitHub personal access token (needs `repo` scope) |
 
-Save the file. These values are read by the launcher and the daily sync scripts.
+> **`APP_VERSION_URL`** is derived automatically from `POS_OFFLINE_SYNC_SOURCE_URL + /api/offline/version` — do not set it manually.
+>
+> **`APP_ZIP_URL`** is returned by the version API (`POS_OFFLINE_ZIP_URL` in the response) — do not set it manually.
+
+**Important:** `.env.offline` is in `.gitignore` and is never committed to the repository. Each store must create its own copy.
 
 ---
 
 ## Step 4: Run the First-Time Setup
 
-Pick the launcher that matches your operating system. Run it from the project root.
+Double-click **[Setup_Offline_POS_Windows.bat](Setup_Offline_POS_Windows.bat)**.
 
-### macOS
+If Windows SmartScreen blocks it:
+1. Click **More info**
+2. Click **Run anyway**
 
-Double-click [Setup_Offline_POS.command](Setup_Offline_POS.command) (or [Setup_Offline_POS.app](Setup_Offline_POS.app)).
-
-If macOS blocks it the first time:
-
-1. Right-click the file → **Open** → **Open** again in the dialog, or
-2. Run once from Terminal:
-   ```bash
-   chmod +x Setup_Offline_POS.command
-   ./Setup_Offline_POS.command
-   ```
-
-### Ubuntu / Linux
-
-```bash
-chmod +x Setup_Offline_POS_Ubuntu.sh
-./Setup_Offline_POS_Ubuntu.sh
-```
-
-Optional desktop shortcut:
-
-```bash
-chmod +x Setup_Offline_POS_Ubuntu.desktop
-```
-
-### Windows
-
-Double-click [Setup_Offline_POS_Windows.bat](Setup_Offline_POS_Windows.bat).
-
-If SmartScreen blocks it, click **More info** → **Run anyway**.
+The script will:
+1. Read `.env.offline`
+2. Derive the version API URL from `POS_OFFLINE_SYNC_SOURCE_URL`
+3. Call the API to get the current app bundle version and ZIP URL
+4. Check the ZIP is reachable before starting
+5. Run `docker compose up -d --build` to pull images and start all containers
+6. Wait for MySQL to be ready and grant database privileges
+7. Wait for the app to bootstrap (ZIP download + `composer install`)
+8. Generate `APP_KEY` if not already set
+9. Stamp the installed version into `.zip_sync_version`
 
 ---
 
-## Step 5: Watch the First Build
+## Step 5: Watch the Progress
 
-The launcher will:
+The Command Prompt window shows live progress. A successful setup ends with:
 
-1. Read `.env.offline`.
-2. Call `APP_VERSION_URL` to resolve the current app bundle version.
-3. Replace `APP_VERSION` in `APP_ZIP_URL` with that version.
-4. Run `docker compose -f docker-compose.github.yml up -d --build`.
-5. Download Laravel source from the ZIP into the `app` container.
-6. Write DB credentials into Laravel `.env`.
-7. Run `composer install` (if `vendor/` is missing).
-8. Run `php artisan migrate --force` with retries while MySQL boots.
-9. Start `web`, `app`, `queue`, `scheduler`, `db`.
+```
+ZIP is available (HTTP 200).
+...
+Setup complete. App is reachable at http://localhost:8080/login
+Stamped installed version (x.x.x) into .env and .zip_sync_version.
+```
 
-First run takes longer because Docker pulls base images and the ZIP is downloaded.
+First run takes **5–15 minutes** because Docker pulls base images and the ZIP is downloaded and extracted.
 
 ---
 
 ## Step 6: Verify the Stack
 
-Check container status:
+Open a new **Command Prompt** and run:
 
-```bash
+```cmd
 docker compose -f docker-compose.github.yml ps
 ```
 
-All five services (`web`, `app`, `queue`, `scheduler`, `db`) should be `running` / `healthy`.
+All five services should be `running`:
 
-Open the app:
+| Service | Role |
+| --- | --- |
+| `web` | Apache / Nginx reverse proxy (port 8080) |
+| `app` | PHP-FPM Laravel application |
+| `queue` | Laravel queue worker |
+| `scheduler` | Laravel task scheduler |
+| `db` | MySQL 5.7 database |
 
-- http://localhost:8080
-- http://localhost:8080/login
+Open the app in a browser:
 
-If the page does not load, check logs:
+- **http://localhost:8080**
+- **http://localhost:8080/login**
 
-```bash
+If the page does not load, check the logs:
+
+```cmd
 docker compose -f docker-compose.github.yml logs --tail=200 app
 docker compose -f docker-compose.github.yml logs --tail=200 web
 ```
 
 ---
 
-## Step 7: (Optional) Schedule Daily Version Sync
+## Step 7: Run Initial Data Sync
 
-Set up a cron job (Linux/macOS) or Task Scheduler entry (Windows) to pull new app versions once per day.
+After the app is up, run a full initial sync of all store data from the central server.
 
-Linux/macOS cron example (2:00 AM daily):
+**Easiest way — Docker Desktop:**
 
-```bash
-0 2 * * * cd /path/to/offline-pos-system && ./scripts/offline/sync-daily.sh >> /var/log/offline-pos-sync.log 2>&1
+1. Open **Docker Desktop**
+2. Go to **Containers**
+3. Click on **offline-pos-system-scheduler-1**
+4. Click the **Exec** tab (opens a terminal inside the container)
+5. Run each command below,
+
+```sh
+php artisan offline:sync-store-data
+php artisan offline:sync-users-security 
+php artisan offline:sync-invoices 
+php artisan offline:sync-inventory
 ```
 
-The script reads `.env.offline`, calls `APP_VERSION_URL`, and only re-syncs when the version differs from the locally stored one.
+
+
+| Command | Schedule | Purpose |
+| --- | --- | --- |
+| `offline:sync-store-data` | Every hour | Store configuration and settings |
+| `offline:sync-users-security` | Every hour | Users and security roles |
+| `offline:sync-invoices` | Every 15 minutes | Invoice data |
+| `offline:sync-inventory` | Daily at 03:00 | Full inventory sync |
+| `offline:sync-inventory --delta=1` | Every 15 minutes | Incremental inventory changes |
 
 ---
 
-## Manual Setup (No Launcher)
+## Step 8: Schedule Daily App Version Sync
 
-If you cannot use the OS launcher, run from the project root:
+Set up Windows Task Scheduler to run **[Sync_Daily_Windows.bat](Sync_Daily_Windows.bat)** once per day so the app stays up to date automatically.
 
-```bash
-APP_ZIP_URL=https://taxnomist.busywizzy.com/pos_<VERSION>.zip \
-DB_DATABASE=agrtl_offline \
-DB_PASSWORD=root123 \
-DB_APP_USER=app \
-DB_APP_PASSWORD=app123 \
-DB_PORT_HOST=3310 \
+1. Open **Task Scheduler** (search in Start menu)
+2. Click **Create Basic Task...**
+3. Name: `Offline POS Daily Sync`
+4. Trigger: **Daily** at a quiet time (e.g. 2:00 AM)
+5. Action: **Start a program**
+6. Program: `cmd.exe`
+7. Arguments: `/c "cd /d C:\path\to\offline-pos-system && Sync_Daily_Windows.bat"`
+8. Click **Finish**
+
+The sync script checks the version API and only downloads a new ZIP when the installed version differs from the server version.
+
+---
+
+## Updating the Code (Pull Latest)
+
+To pull the latest project files from GitHub, double-click **[Pull_Repo_Windows.bat](Pull_Repo_Windows.bat)**.
+
+It reads `GIT_USERNAME` and `GIT_TOKEN` from `.env.offline`, authenticates to GitHub, and runs `git pull`. After pulling, restart the Docker stack to apply any compose or Dockerfile changes:
+
+```cmd
 docker compose -f docker-compose.github.yml up -d --build
-```
-
-Replace `<VERSION>` with the current bundle version returned by the API.
-
-Manual migration (only if needed):
-
-```bash
-docker compose -f docker-compose.github.yml exec -T app sh -lc "php artisan migrate --force"
 ```
 
 ---
@@ -176,22 +207,26 @@ docker compose -f docker-compose.github.yml exec -T app sh -lc "php artisan migr
 
 | Symptom | Action |
 | --- | --- |
-| Docker not found | Install Docker Desktop and ensure it is running |
+| Docker not found | Install Docker Desktop and ensure it is running (whale in system tray) |
+| `SmartScreen blocked` | Click **More info → Run anyway** |
 | Port 8080 already in use | Stop the other service, or change the `web` port mapping in `docker-compose.github.yml` |
-| Port 3310 already in use | Set `DB_PORT_HOST` to a free port in the launcher |
-| ZIP download fails | Verify `APP_VERSION_URL` and `APP_ZIP_URL` reachable from this machine and `OFFLINE_TOKEN` is valid |
-| App returns 500 | Check `docker compose -f docker-compose.github.yml logs --tail=200 app` |
-| Migrations failed | Run the manual migration command above after DB is fully up |
-| Need a clean rebuild | `docker compose -f docker-compose.github.yml up -d --build --force-recreate` (do **not** use `down -v` unless you want to wipe the DB) |
+| Port 3308 already in use | Set `DB_PORT_HOST` to a free port before running setup |
+| ZIP availability check fails | Verify `POS_OFFLINE_SYNC_SOURCE_URL` is correct and the machine has internet access |
+| `POS_OFFLINE_SYNC_TOKEN` error | Check the token value in `.env.offline` — no trailing spaces |
+| App returns 500 | Run: `docker compose -f docker-compose.github.yml logs --tail=200 app` |
+| Migrations failed | Run: `docker compose -f docker-compose.github.yml exec -T app sh -lc "php artisan migrate --force"` |
+| Need a clean rebuild | `docker compose -f docker-compose.github.yml up -d --build --force-recreate` |
+| Want to wipe DB and start fresh | `docker compose -f docker-compose.github.yml down -v` then re-run setup (**destroys all data**) |
 
 ---
 
 ## Reference Files
 
-- Compose file: [docker-compose.github.yml](docker-compose.github.yml)
-- Store credentials: [.env.offline](.env.offline)
-- Bootstrap script: [docker/offline/php/start-app.sh](docker/offline/php/start-app.sh)
-- Full setup script: [scripts/offline/setup-full-offline.sh](scripts/offline/setup-full-offline.sh)
-- Daily sync script: [scripts/offline/sync-daily.sh](scripts/offline/sync-daily.sh)
-- Full runbook: [README.md](README.md)
-- Deployment details: [Offline_POS_Deployment_Steps.md](Offline_POS_Deployment_Steps.md)
+| File | Purpose |
+| --- | --- |
+| [Setup_Offline_POS_Windows.bat](Setup_Offline_POS_Windows.bat) | First-time Docker setup |
+| [Sync_Daily_Windows.bat](Sync_Daily_Windows.bat) | Daily version sync |
+| [Pull_Repo_Windows.bat](Pull_Repo_Windows.bat) | Pull latest code from GitHub |
+| [docker-compose.github.yml](docker-compose.github.yml) | Docker Compose configuration |
+| [.env.offline](.env.offline) | Store credentials *(not in git)* |
+| [docker/offline/php/start-app.sh](docker/offline/php/start-app.sh) | Container bootstrap script |

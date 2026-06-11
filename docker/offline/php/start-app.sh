@@ -9,9 +9,10 @@ APP_TARGET_VERSION="${APP_TARGET_VERSION:-}"
 VERSION_MARKER_FILE="${APP_VERSION_MARKER_FILE:-/var/www/html/.zip_sync_version}"
 APP_ENABLE_VERSION_SYNC_ON_START="${APP_ENABLE_VERSION_SYNC_ON_START:-}"
 DB_SETUP_MODE="${DB_SETUP_MODE:-structure}"
-# Credentials for the version API — fall back through several common env var names.
-OFFLINE_STORE_ID="${OFFLINE_STORE_ID:-${POS_OFFLINE_SYNC_STORE_ID:-}}"
-OFFLINE_TOKEN="${OFFLINE_TOKEN:-${POS_OFFLINE_SYNC_TOKEN:-}}"
+# POS_OFFLINE_SYNC_* are the primary names; OFFLINE_* kept as fallbacks.
+OFFLINE_STORE_ID="${POS_OFFLINE_SYNC_STORE_ID:-${OFFLINE_STORE_ID:-}}"
+OFFLINE_TOKEN="${POS_OFFLINE_SYNC_TOKEN:-${OFFLINE_TOKEN:-}}"
+OFFLINE_API_BASE_URL="${POS_OFFLINE_SYNC_SOURCE_URL:-${OFFLINE_API_BASE_URL:-}}"
 
 cd /var/www/html
 
@@ -23,18 +24,25 @@ if [ -f .env ]; then
   _env_val() { grep "^${1}=" .env 2>/dev/null | head -n1 | cut -d= -f2- | sed 's/[[:space:]]*$//'; }
   [ -z "$APP_VERSION_URL" ]  && APP_VERSION_URL="$(_env_val APP_VERSION_URL)"
   [ -z "$APP_ZIP_URL" ]      && APP_ZIP_URL="$(_env_val APP_ZIP_URL)"
-  [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val OFFLINE_STORE_ID)"
-  [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val OFFLINE_TOKEN)"
-  [ -z "$OFFLINE_STORE_ID" ] && OFFLINE_STORE_ID="$(_env_val POS_OFFLINE_SYNC_STORE_ID)"
-  [ -z "$OFFLINE_TOKEN" ]    && OFFLINE_TOKEN="$(_env_val POS_OFFLINE_SYNC_TOKEN)"
+  [ -z "$OFFLINE_STORE_ID" ]       && OFFLINE_STORE_ID="$(_env_val POS_OFFLINE_SYNC_STORE_ID)"
+  [ -z "$OFFLINE_TOKEN" ]          && OFFLINE_TOKEN="$(_env_val POS_OFFLINE_SYNC_TOKEN)"
+  [ -z "$OFFLINE_API_BASE_URL" ]   && OFFLINE_API_BASE_URL="$(_env_val POS_OFFLINE_SYNC_SOURCE_URL)"
+  [ -z "$OFFLINE_STORE_ID" ]       && OFFLINE_STORE_ID="$(_env_val OFFLINE_STORE_ID)"
+  [ -z "$OFFLINE_TOKEN" ]          && OFFLINE_TOKEN="$(_env_val OFFLINE_TOKEN)"
+  [ -z "$OFFLINE_API_BASE_URL" ]   && OFFLINE_API_BASE_URL="$(_env_val OFFLINE_API_BASE_URL)"
 fi
 
-if [ -z "$APP_ZIP_URL" ]; then
+# Derive APP_VERSION_URL from POS_OFFLINE_SYNC_SOURCE_URL when not explicitly set.
+if [ -z "$APP_VERSION_URL" ] && [ -n "$OFFLINE_API_BASE_URL" ]; then
+  APP_VERSION_URL="$(printf '%s' "$OFFLINE_API_BASE_URL" | sed 's|/*$||')/api/offline/version"
+fi
+
+if [ -z "$APP_ZIP_URL" ] && [ -z "$APP_VERSION_URL" ]; then
   if [ ! -f artisan ]; then
-    echo "APP_ZIP_URL is required for first startup when app code is missing"
+    echo "APP_ZIP_URL or POS_OFFLINE_SYNC_SOURCE_URL is required for first startup when app code is missing"
     exit 1
   fi
-  echo "APP_ZIP_URL not provided; using existing app code in volume."
+  echo "APP_ZIP_URL not provided; version API will supply it."
 fi
 
 download_and_extract_zip() {
@@ -68,9 +76,14 @@ download_and_extract_zip() {
   rm -rf "$tmp_dir"
 }
 
+FETCHED_ZIP_URL=""
+FETCHED_VERSION=""
+
 fetch_target_version() {
+  FETCHED_ZIP_URL=""
+  FETCHED_VERSION=""
   if [ -n "$APP_TARGET_VERSION" ]; then
-    printf "%s" "$APP_TARGET_VERSION"
+    FETCHED_VERSION="$APP_TARGET_VERSION"
     return 0
   fi
 
@@ -89,6 +102,10 @@ fetch_target_version() {
   fi
 
   compact="$(printf "%s" "$response" | tr -d '\r\n')"
+
+  # Extract ZIP URL from API response.
+  FETCHED_ZIP_URL="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_ZIP_URL"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/\\\//\//g')"
+
   parsed="$(printf "%s" "$compact" | sed -n 's/.*"POS_OFFLINE_BUNDLE_APP_VERSION"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
 
   if [ -z "$parsed" ]; then
@@ -96,14 +113,15 @@ fetch_target_version() {
   fi
 
   if [ -n "$parsed" ]; then
-    printf "%s" "$parsed"
+    FETCHED_VERSION="$parsed"
   else
-    printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    FETCHED_VERSION="$(printf "%s" "$compact" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
   fi
 }
 
 sync_from_version_if_needed() {
-  target_version="$(fetch_target_version)"
+  fetch_target_version
+  target_version="$FETCHED_VERSION"
   if [ -z "$target_version" ]; then
     return 1
   fi
@@ -118,12 +136,15 @@ sync_from_version_if_needed() {
     return 0
   fi
 
-  if [ -z "$APP_ZIP_URL" ]; then
-    echo "APP_ZIP_URL is required to sync code for target version ${target_version}."
+  _versioned_url="${FETCHED_ZIP_URL:-}"
+  if [ -z "$_versioned_url" ] && [ -n "$APP_ZIP_URL" ]; then
+    _versioned_url="$(printf '%s' "$APP_ZIP_URL" | sed "s/APP_VERSION/${target_version}/g")"
+  fi
+  if [ -z "$_versioned_url" ]; then
+    echo "No ZIP URL available from API response or APP_ZIP_URL for version ${target_version}."
     exit 1
   fi
 
-  _versioned_url="$(printf '%s' "$APP_ZIP_URL" | sed "s/APP_VERSION/${target_version}/g")"
   echo "Target app version ${target_version} differs from local version; syncing ZIP."
   download_and_extract_zip "$_versioned_url"
   printf "%s" "$target_version" > "$VERSION_MARKER_FILE"
@@ -239,14 +260,14 @@ set_env_value "POS_OFFLINE_MODE" "${POS_OFFLINE_MODE:-true}"
 set_env_value "CACHE_DRIVER"      "${CACHE_DRIVER:-file}"
 set_env_value "SESSION_DRIVER"    "${SESSION_DRIVER:-file}"
 set_env_value "QUEUE_CONNECTION"  "${QUEUE_CONNECTION:-database}"
-[ -n "${OFFLINE_API_BASE_URL:-}" ]        && set_env_value "OFFLINE_API_BASE_URL"        "$OFFLINE_API_BASE_URL"
+[ -n "${OFFLINE_API_BASE_URL:-}" ]        && set_env_value "POS_OFFLINE_SYNC_SOURCE_URL" "$OFFLINE_API_BASE_URL"
 [ -n "${POS_OFFLINE_SYNC_STORE_ID:-}" ]   && set_env_value "POS_OFFLINE_SYNC_STORE_ID"   "$POS_OFFLINE_SYNC_STORE_ID"
 [ -n "${POS_OFFLINE_SYNC_SOURCE_URL:-}" ] && set_env_value "POS_OFFLINE_SYNC_SOURCE_URL" "$POS_OFFLINE_SYNC_SOURCE_URL"
 [ -n "${POS_OFFLINE_SYNC_TOKEN:-}" ]      && set_env_value "POS_OFFLINE_SYNC_TOKEN"      "$POS_OFFLINE_SYNC_TOKEN"
 # Persist version-sync config so it survives plain container restarts where
 # Docker env vars are not re-injected from the host shell.
 [ -n "${APP_VERSION_URL:-}" ]             && set_env_value "APP_VERSION_URL"             "$APP_VERSION_URL"
-[ -n "${OFFLINE_STORE_ID:-}" ]            && set_env_value "OFFLINE_STORE_ID"            "$OFFLINE_STORE_ID"
+[ -n "${OFFLINE_STORE_ID:-}" ]            && set_env_value "POS_OFFLINE_SYNC_STORE_ID"   "$OFFLINE_STORE_ID"
 [ -n "${OFFLINE_TOKEN:-}" ]               && set_env_value "OFFLINE_TOKEN"               "$OFFLINE_TOKEN"
 # Always write the ZIP URL template (with APP_VERSION placeholder) not a
 # resolved URL, so that version substitution works on the next version bump.
