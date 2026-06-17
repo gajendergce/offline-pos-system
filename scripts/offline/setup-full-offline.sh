@@ -225,9 +225,16 @@ fi
 echo "Syncing .env.offline values into app .env..."
 sync_offline_env_into_app_env
 
-# Stamp the installed version so sync-daily.sh can detect future updates.
-if [[ -n "$FETCHED_VERSION" ]]; then
-  docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
+echo "Waiting for app endpoint to become ready..."
+for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
+  status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
+  if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
+    echo "Ensuring encryption key is set..."
+    docker compose -f "$COMPOSE_FILE" exec -T app php -r \
+      "\$e=file_get_contents('/var/www/html/.env');if(preg_match('/^APP_KEY=\S/m',\$e))exit;\$k='base64:'.base64_encode(random_bytes(32));\$e=preg_match('/^APP_KEY=/m',\$e)?preg_replace('/^APP_KEY=.*/m','APP_KEY='.\$k,\$e):\$e.chr(10).'APP_KEY='.\$k;file_put_contents('/var/www/html/.env',\$e);" \
+      >/dev/null 2>&1 || true
+    if [[ -n "$FETCHED_VERSION" ]]; then
+      docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
 cd /var/www/html
 if [ -f .env ]; then
   if grep -q '^POS_OFFLINE_BUNDLE_APP_VERSION=' .env; then
@@ -238,17 +245,8 @@ if [ -f .env ]; then
 fi
 printf '%s' '${FETCHED_VERSION}' > .zip_sync_version
 "
-  echo "Stamped installed version (${FETCHED_VERSION}) into .env and .zip_sync_version"
-fi
-
-echo "Waiting for app endpoint to become ready..."
-for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
-  status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
-  if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
-    echo "Ensuring encryption key is set..."
-    docker compose -f "$COMPOSE_FILE" exec -T app php -r \
-      "\$e=file_get_contents('/var/www/html/.env');if(preg_match('/^APP_KEY=\S/m',\$e))exit;\$k='base64:'.base64_encode(random_bytes(32));\$e=preg_match('/^APP_KEY=/m',\$e)?preg_replace('/^APP_KEY=.*/m','APP_KEY='.\$k,\$e):\$e.chr(10).'APP_KEY='.\$k;file_put_contents('/var/www/html/.env',\$e);" \
-      >/dev/null 2>&1 || true
+      echo "Stamped installed version (${FETCHED_VERSION}) into .env and .zip_sync_version"
+    fi
     echo "Setup complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
     echo "Tip: code sync runs once on first startup and skips on container restarts by default."
     echo "To force sync every start, run with APP_SYNC_ZIP_ON_START=always."

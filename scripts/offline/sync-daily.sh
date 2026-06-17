@@ -282,7 +282,12 @@ echo "Syncing .env.offline values into app .env..."
 sync_offline_env_into_app_env "$APP_ZIP_URL"
 ensure_scheduler_sync_keys
 
-docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
+echo "Waiting for app endpoint to become ready..."
+for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
+  status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
+  if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
+    ensure_scheduler_sync_keys
+    docker compose -f "$COMPOSE_FILE" exec -T app sh -lc "
 cd /var/www/html
 if [ -f .env ]; then
   if grep -q '^POS_OFFLINE_BUNDLE_APP_VERSION=' .env; then
@@ -293,13 +298,7 @@ if [ -f .env ]; then
 fi
 printf '%s' '${new_version}' > .zip_sync_version
 "
-echo "Stamped synced version (${new_version}) into .env and .zip_sync_version"
-
-echo "Waiting for app endpoint to become ready..."
-for ((i=1; i<=READY_CHECK_ATTEMPTS; i++)); do
-  status_code="$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login || true)"
-  if [[ "$status_code" == "200" || "$status_code" == "302" ]]; then
-    ensure_scheduler_sync_keys
+    echo "Stamped synced version (${new_version}) into .env and .zip_sync_version"
     echo "Daily sync complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
     exit 0
   fi
