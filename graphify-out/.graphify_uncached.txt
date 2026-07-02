@@ -1,0 +1,13 @@
+/Users/gajenderyadav/projects/offline-pos-system/.claude/settings.local.json
+/Users/gajenderyadav/projects/offline-pos-system/docker/mysql/00-grants.sql
+/Users/gajenderyadav/projects/offline-pos-system/docker/mysql/sampledb.sql
+/Users/gajenderyadav/projects/offline-pos-system/docker/offline/php/start-app.sh
+/Users/gajenderyadav/projects/offline-pos-system/scripts/offline/setup-from-github.sh
+/Users/gajenderyadav/projects/offline-pos-system/scripts/offline/setup-full-offline.sh
+/Users/gajenderyadav/projects/offline-pos-system/scripts/offline/sync-daily.sh
+/Users/gajenderyadav/projects/offline-pos-system/AGENTS.md
+/Users/gajenderyadav/projects/offline-pos-system/First_Iteration_Scope.md
+/Users/gajenderyadav/projects/offline-pos-system/First_Time_Setup.md
+/Users/gajenderyadav/projects/offline-pos-system/Offline_POS_Deployment_Steps.md
+/Users/gajenderyadav/projects/offline-pos-system/README.md
+/Users/gajenderyadav/projects/offline-pos-system/docker-compose.github.yml

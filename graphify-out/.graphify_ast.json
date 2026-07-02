@@ -1,0 +1,553 @@
+{
+  "nodes": [
+    {
+      "id": "php_start_app",
+      "label": "start-app.sh",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "users_gajenderyadav_projects_offline_pos_system_docker_offline_php_start_app_sh__entry",
+      "label": "start-app.sh script",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "php_start_app_env_val",
+      "label": "_env_val()",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L24",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "php_start_app_download_and_extract_zip",
+      "label": "download_and_extract_zip()",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L48",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "php_start_app_fetch_target_version",
+      "label": "fetch_target_version()",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L82",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "php_start_app_sync_from_version_if_needed",
+      "label": "sync_from_version_if_needed()",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L122",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "php_start_app_stamp_markers",
+      "label": "_stamp_markers()",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L188",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "php_start_app_set_env_value",
+      "label": "set_env_value()",
+      "file_type": "code",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L238",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_setup_from_github",
+      "label": "setup-from-github.sh",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-from-github.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_setup_from_github_sh__entry",
+      "label": "setup-from-github.sh script",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-from-github.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_setup_from_github_cleanup",
+      "label": "cleanup()",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-from-github.sh",
+      "source_location": "L18",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_setup_full_offline",
+      "label": "setup-full-offline.sh",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_setup_full_offline_sh__entry",
+      "label": "setup-full-offline.sh script",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_setup_full_offline_sync_offline_env_into_app_env",
+      "label": "sync_offline_env_into_app_env()",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L35",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_setup_full_offline_fetch_target_version",
+      "label": "fetch_target_version()",
+      "file_type": "code",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L78",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_sync_daily",
+      "label": "sync-daily.sh",
+      "file_type": "code",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_sync_daily_sh__entry",
+      "label": "sync-daily.sh script",
+      "file_type": "code",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_sync_daily_sync_offline_env_into_app_env",
+      "label": "sync_offline_env_into_app_env()",
+      "file_type": "code",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L34",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_sync_daily_ensure_scheduler_sync_keys",
+      "label": "ensure_scheduler_sync_keys()",
+      "file_type": "code",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L91",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_sync_daily_usage",
+      "label": "usage()",
+      "file_type": "code",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L120",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "offline_sync_daily_fetch_target_version",
+      "label": "fetch_target_version()",
+      "file_type": "code",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L140",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "php_start_app",
+      "target": "users_gajenderyadav_projects_offline_pos_system_docker_offline_php_start_app_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "php_start_app",
+      "target": "php_start_app_env_val",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "php_start_app",
+      "target": "php_start_app_download_and_extract_zip",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "php_start_app",
+      "target": "php_start_app_fetch_target_version",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "php_start_app",
+      "target": "php_start_app_sync_from_version_if_needed",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L122",
+      "weight": 1.0
+    },
+    {
+      "source": "php_start_app",
+      "target": "php_start_app_stamp_markers",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L188",
+      "weight": 1.0
+    },
+    {
+      "source": "php_start_app",
+      "target": "php_start_app_set_env_value",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L238",
+      "weight": 1.0
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_docker_offline_php_start_app_sh__entry",
+      "target": "php_start_app_sync_from_version_if_needed",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L193",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_docker_offline_php_start_app_sh__entry",
+      "target": "php_start_app_download_and_extract_zip",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L199",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_docker_offline_php_start_app_sh__entry",
+      "target": "php_start_app_stamp_markers",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L200",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_docker_offline_php_start_app_sh__entry",
+      "target": "php_start_app_set_env_value",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L248",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "php_start_app_sync_from_version_if_needed",
+      "target": "php_start_app_fetch_target_version",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L123",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "php_start_app_sync_from_version_if_needed",
+      "target": "php_start_app_download_and_extract_zip",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "docker/offline/php/start-app.sh",
+      "source_location": "L149",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "offline_setup_from_github",
+      "target": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_setup_from_github_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-from-github.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_setup_from_github",
+      "target": "offline_setup_from_github_cleanup",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-from-github.sh",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_setup_full_offline",
+      "target": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_setup_full_offline_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_setup_full_offline",
+      "target": "offline_env_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L20",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "offline_setup_full_offline",
+      "target": "offline_setup_full_offline_sync_offline_env_into_app_env",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_setup_full_offline",
+      "target": "offline_setup_full_offline_fetch_target_version",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_setup_full_offline_sh__entry",
+      "target": "offline_setup_full_offline_fetch_target_version",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L112",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_setup_full_offline_sh__entry",
+      "target": "offline_setup_full_offline_sync_offline_env_into_app_env",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/setup-full-offline.sh",
+      "source_location": "L226",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "offline_sync_daily",
+      "target": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_sync_daily_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_sync_daily",
+      "target": "offline_env_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L15",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "offline_sync_daily",
+      "target": "offline_sync_daily_sync_offline_env_into_app_env",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_sync_daily",
+      "target": "offline_sync_daily_ensure_scheduler_sync_keys",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L91",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_sync_daily",
+      "target": "offline_sync_daily_usage",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "offline_sync_daily",
+      "target": "offline_sync_daily_fetch_target_version",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L140",
+      "weight": 1.0
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_sync_daily_sh__entry",
+      "target": "offline_sync_daily_usage",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L133",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_sync_daily_sh__entry",
+      "target": "offline_sync_daily_fetch_target_version",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L186",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_sync_daily_sh__entry",
+      "target": "offline_sync_daily_sync_offline_env_into_app_env",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L197",
+      "weight": 1.0,
+      "context": "call"
+    },
+    {
+      "source": "users_gajenderyadav_projects_offline_pos_system_scripts_offline_sync_daily_sh__entry",
+      "target": "offline_sync_daily_ensure_scheduler_sync_keys",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/offline/sync-daily.sh",
+      "source_location": "L198",
+      "weight": 1.0,
+      "context": "call"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
