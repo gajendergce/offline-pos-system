@@ -177,6 +177,16 @@ if errorlevel 1 (
 
 echo Setup complete. App is reachable at http://localhost:8080/login
 
+REM ── Run initial data sync ────────────────────────────────────────────────────
+echo Running initial data sync commands...
+docker compose -f "%COMPOSE_FILE%" exec -T app php artisan offline:sync-store-data %POS_OFFLINE_SYNC_STORE_ID%
+docker compose -f "%COMPOSE_FILE%" exec -T app php artisan offline:sync-users-security %POS_OFFLINE_SYNC_STORE_ID%
+docker compose -f "%COMPOSE_FILE%" exec -T app php artisan offline:sync-invoices %POS_OFFLINE_SYNC_STORE_ID%
+docker compose -f "%COMPOSE_FILE%" exec -T app php artisan offline:sync-inventory %POS_OFFLINE_SYNC_STORE_ID%
+docker compose -f "%COMPOSE_FILE%" exec -T app php artisan offline:sync-inventory %POS_OFFLINE_SYNC_STORE_ID% --delta=1
+docker compose -f "%COMPOSE_FILE%" exec -T app php artisan offline:sync-customers %POS_OFFLINE_SYNC_STORE_ID%
+echo Initial data sync complete.
+
 REM ── Stamp installed version ─────────────────────────────────────────────────
 if defined SETUP_VERSION (
   docker compose -f "%COMPOSE_FILE%" exec -T app sh -lc "cd /var/www/html; if [ -f .env ]; then if grep -q '^POS_OFFLINE_BUNDLE_APP_VERSION=' .env; then sed -i 's|^POS_OFFLINE_BUNDLE_APP_VERSION=.*|POS_OFFLINE_BUNDLE_APP_VERSION=%SETUP_VERSION%|' .env; else echo 'POS_OFFLINE_BUNDLE_APP_VERSION=%SETUP_VERSION%' >> .env; fi; fi; printf '%%s' '%SETUP_VERSION%' > .zip_sync_version" >nul 2>&1
