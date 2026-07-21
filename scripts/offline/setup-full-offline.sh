@@ -247,6 +247,14 @@ printf '%s' '${FETCHED_VERSION}' > .zip_sync_version
 "
       echo "Stamped installed version (${FETCHED_VERSION}) into .env and .zip_sync_version"
     fi
+    echo "Running initial data sync commands..."
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan offline:sync-store-data "$OFFLINE_STORE_ID" || true
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan offline:sync-users-security "$OFFLINE_STORE_ID" || true
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan offline:sync-invoices "$OFFLINE_STORE_ID" || true
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan offline:sync-inventory "$OFFLINE_STORE_ID" || true
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan offline:sync-inventory "$OFFLINE_STORE_ID" --delta=1 || true
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan offline:sync-customers "$OFFLINE_STORE_ID" || true
+    echo "Initial data sync complete."
     echo "Setup complete. App is reachable at http://localhost:8080/login (HTTP $status_code)."
     echo "Tip: code sync runs once on first startup and skips on container restarts by default."
     echo "To force sync every start, run with APP_SYNC_ZIP_ON_START=always."
